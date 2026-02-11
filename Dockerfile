@@ -63,6 +63,7 @@ ENV API_PORT=3001
 ENV DUMP_PORT=3000
 ENV WEB_PORT=3002
 ENV API_URL=http://localhost:3001/rpc
+ENV VITE_API_URL=http://localhost:3001/rpc
 ENV DB_PATH=/app/data/db.sqlite
 
 RUN mkdir -p /app/data
