@@ -1,0 +1,25 @@
+{
+  "tasks": {
+    "dev": "deno run --allow-env --allow-read --allow-sys --allow-ffi --allow-run --allow-write --allow-net --node-modules-dir npm:vite --port 3002",
+    "build": "deno run --allow-env --allow-read --allow-sys --allow-ffi --allow-run --allow-write --allow-net --node-modules-dir npm:vite build",
+    "preview": "deno run --allow-env --allow-read --allow-sys --allow-ffi --allow-run --allow-write --allow-net --node-modules-dir npm:vite preview --port 3002",
+    "serve": "deno run --allow-env --allow-read --allow-sys --allow-net --allow-ffi --allow-run --allow-read --allow-write jsr:@std/http@1/file-server dist/"
+  },
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM", "DOM.Iterable", "deno.ns"]
+  },
+  "imports": {
+    "@deno/vite-plugin": "npm:@deno/vite-plugin@^1.0.5",
+    "@sveltejs/vite-plugin-svelte": "npm:@sveltejs/vite-plugin-svelte@^6.2.4",
+    "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.1.18",
+    "@lucide/svelte": "npm:@lucide/svelte@^0.563.1",
+    "svelte": "npm:svelte@^5.49.0",
+    "vite": "npm:vite@^7.3.1",
+    "tailwindcss": "npm:tailwindcss@^4.1.18",
+    "@repo/orpc": "../../packages/orpc/mod.ts",
+    "@orpc/client": "npm:@orpc/client@^1.13.4",
+    "@orpc/contract": "npm:@orpc/contract@^1.13.4",
+    "@valibot/valibot": "jsr:@valibot/valibot@^1.2.0",
+    "hono": "jsr:@hono/hono@^4.7.11"
+  }
+}

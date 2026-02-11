@@ -1,0 +1,35 @@
+services:
+  heyttpdump:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: heyttpdump
+    ports:
+      - "3000:3000" # DUMP server
+      - "3001:3001" # API server
+      - "3002:3002" # WEB server
+    environment:
+      - API_PORT=3001
+      - DUMP_PORT=3000
+      - WEB_PORT=3002
+      - API_URL=http://localhost:3001/rpc
+      - DB_PATH=/app/data/db.sqlite
+    volumes:
+      # Persist SQLite database (mount the data directory to avoid file/directory issues)
+      - ./data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "deno",
+          "eval",
+          "try { await fetch('http://localhost:3001'); Deno.exit(0); } catch { Deno.exit(1); }",
+        ]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  data:

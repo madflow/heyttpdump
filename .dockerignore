@@ -1,0 +1,111 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE and Editor
+.vscode
+.idea
+.fleet
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings
+
+# Dependencies
+node_modules
+vendor
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build artifacts
+apps/web/dist
+apps/web/.vite
+apps/api/node_modules
+apps/dump/node_modules
+apps/web/node_modules
+_fresh
+dist
+build
+
+# Database files
+apps/api/db.sqlite
+apps/api/db.sqlite-*
+apps/api/*.db
+apps/api/*.db-*
+*.sqlite
+*.sqlite-journal
+*.sqlite-shm
+*.sqlite-wal
+data
+
+# Environment files
+.env
+.env.*
+!.env.example
+.envrc
+
+# Logs
+*.log
+logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Deno
+.deno
+deno.lock
+
+# Coverage
+coverage
+.nyc_output
+*.lcov
+
+# Test files
+*.test.ts
+*.spec.ts
+__tests__
+test
+tests
+.test
+
+# Documentation
+*.md
+!README.md
+docs
+
+# Docker files
+Dockerfile*
+.dockerignore
+docker-compose*.yml
+.docker
+
+# CI/CD
+.github
+.gitlab
+.circleci
+.travis.yml
+azure-pipelines.yml
+Jenkinsfile
+
+# Misc
+tmp
+temp
+*.tmp
+.cache
+.parcel-cache

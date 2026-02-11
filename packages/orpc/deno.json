@@ -1,0 +1,8 @@
+{
+  "name": "@repo/orpc",
+  "exports": {
+    ".": "./mod.ts",
+    "./client/*": "./client/*.ts",
+    "./contract/*": "./contract/*.ts"
+  }
+}

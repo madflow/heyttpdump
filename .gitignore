@@ -1,0 +1,14 @@
+# dotenv environment variable files
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# Fresh build directory
+_fresh/
+# npm + other dependencies
+node_modules/
+vendor/
+
+apps/api/db.sqlite
+data/db.sqlite

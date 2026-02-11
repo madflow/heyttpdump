@@ -1,0 +1,19 @@
+{
+  "workspace": ["apps/*", "packages/*"],
+  "compilerOptions": {
+    "checkJs": true
+  },
+  "tasks": {
+    "dev:api": "deno task --cwd=apps/api dev",
+    "dev:dump": "deno task --cwd=apps/dump dev",
+    "dev:web": "deno task --cwd=apps/web dev",
+    "dev": "deno task dev:api & deno task dev:dump & deno task dev:web",
+    "migrate": "deno task --cwd=apps/api migrate"
+  },
+  "imports": {
+    "@orpc/client": "npm:@orpc/client@^1.13.4",
+    "@orpc/contract": "npm:@orpc/contract@^1.13.4",
+    "@orpc/server": "npm:@orpc/server@^1.13.4",
+    "@valibot/valibot": "jsr:@valibot/valibot@^1.2.0"
+  }
+}
