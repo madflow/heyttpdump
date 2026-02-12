@@ -7,10 +7,10 @@ This document provides coding guidelines and commands for AI agents working on t
 **heyttpdump** is a TypeScript/Deno monorepo for capturing and viewing HTTP requests. It consists of:
 - **apps/api** - Backend API server (port 3001) with oRPC handlers and SQLite database
 - **apps/dump** - HTTP dump service (port 3000) that captures incoming requests
-- **apps/web** - Svelte 5 frontend (port 3002) for viewing captured requests
+- **apps/kit** - SvelteKit frontend (port 3002) for viewing captured requests
 - **packages/orpc** - Shared RPC contract and type-safe client
 
-**Tech Stack:** Deno 2.0+, TypeScript, Hono, Svelte 5, Vite 7, Tailwind CSS 4, SQLite, oRPC, Valibot
+**Tech Stack:** Deno 2.0+, TypeScript, Hono, SvelteKit, Svelte 5, Vite 7, Tailwind CSS 4, SQLite, oRPC, Valibot
 
 ## Build, Lint, and Test Commands
 
@@ -22,7 +22,7 @@ deno task dev           # or: make dev
 # Start individual services
 deno task dev:api       # API server only
 deno task dev:dump      # Dump server only
-deno task dev:web       # Web UI only
+deno task dev:kit       # SvelteKit UI only
 
 # Initialize project (run migrations)
 make init
@@ -31,10 +31,10 @@ make init
 ### Build
 ```bash
 # Build frontend for production
-deno task --cwd=apps/web build
+deno task --cwd=apps/kit build
 
 # Preview production build
-deno task --cwd=apps/web preview
+deno task --cwd=apps/kit preview
 ```
 
 ### Linting and Formatting
@@ -279,7 +279,7 @@ function rowToOutput(row: RequestRow): RequestOutput {
 </div>
 ```
 
-**Component organization:** `apps/web/src/components/` - one component per file
+**Component organization:** `apps/kit/src/lib/components/` - one component per file
 
 ## Common Patterns
 
@@ -322,5 +322,5 @@ When making changes, prefer editing existing files:
 - Backend routes: `apps/api/router.ts`
 - Database operations: `apps/api/db.ts`
 - RPC contracts: `packages/orpc/contract/index.ts`
-- Frontend app: `apps/web/src/App.svelte`
-- Components: `apps/web/src/components/*.svelte`
+- Frontend page: `apps/kit/src/routes/+page.svelte`
+- Components: `apps/kit/src/lib/components/*.svelte`

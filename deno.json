@@ -3,17 +3,18 @@
   "compilerOptions": {
     "checkJs": true
   },
+  "unstable": ["fmt-component"],
   "tasks": {
     "dev:api": "deno task --cwd=apps/api dev",
     "dev:dump": "deno task --cwd=apps/dump dev",
-    "dev:web": "deno task --cwd=apps/web dev",
-    "dev": "deno task dev:api & deno task dev:dump & deno task dev:web",
+    "dev:kit": "deno task --cwd=apps/kit dev",
+    "dev": "deno task dev:api & deno task dev:dump & deno task dev:kit",
     "migrate": "deno task --cwd=apps/api migrate"
   },
   "imports": {
     "@orpc/client": "npm:@orpc/client@^1.13.4",
     "@orpc/contract": "npm:@orpc/contract@^1.13.4",
     "@orpc/server": "npm:@orpc/server@^1.13.4",
-    "@valibot/valibot": "jsr:@valibot/valibot@^1.2.0"
+    "valibot": "npm:valibot@^1.0.0-beta.3"
   }
 }

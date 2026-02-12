@@ -23,11 +23,12 @@ yarn-error.log*
 pnpm-debug.log*
 
 # Build artifacts
-apps/web/dist
-apps/web/.vite
+apps/kit/.svelte-kit
+apps/kit/.vite
+apps/kit/build
 apps/api/node_modules
 apps/dump/node_modules
-apps/web/node_modules
+apps/kit/node_modules
 _fresh
 dist
 build

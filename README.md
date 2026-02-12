@@ -41,7 +41,7 @@ make docker-down
 
 - **apps/api** - Backend API server (port 3001)
 - **apps/dump** - HTTP dump service (port 3000)
-- **apps/web** - Svelte 5 frontend (port 3002)
+- **apps/kit** - SvelteKit frontend (port 3002)
 - **packages/orpc** - Shared RPC contract
 
 ## Tech Stack

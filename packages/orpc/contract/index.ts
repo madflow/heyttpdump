@@ -1,5 +1,5 @@
 import { oc } from "@orpc/contract";
-import * as v from "@valibot/valibot";
+import * as v from "valibot";
 
 // Core schemas
 const payloadSchema = v.object({

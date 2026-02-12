@@ -12,3 +12,4 @@ vendor/
 
 apps/api/db.sqlite
 data/db.sqlite
+apps/kit/.vite

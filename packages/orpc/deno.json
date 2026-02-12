@@ -4,5 +4,9 @@
     ".": "./mod.ts",
     "./client/*": "./client/*.ts",
     "./contract/*": "./contract/*.ts"
+  },
+  "imports": {
+    "@orpc/contract": "npm:@orpc/contract@^1.13.4",
+    "valibot": "npm:valibot@^1.0.0-beta.3"
   }
 }

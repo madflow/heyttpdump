@@ -5,14 +5,20 @@ services:
       dockerfile: Dockerfile
     container_name: heyttpdump
     ports:
-      - "3000:3000" # DUMP server
-      - "3001:3001" # API server
-      - "3002:3002" # WEB server
+      - "${HOST_DUMP_PORT:-8081}:3000" # DUMP server
+      - "${HOST_API_PORT:-8082}:3001" # API server
+      - "${HOST_WEB_PORT:-8083}:3002" # WEB server
     environment:
+      # Internal service ports (within container)
       - API_PORT=3001
       - DUMP_PORT=3000
       - WEB_PORT=3002
+      # SvelteKit adapter-node configuration
+      - PORT=3002
+      - HOST=0.0.0.0
+      # API URL for server-side proxy (container-local)
       - API_URL=http://localhost:3001/rpc
+      # Database location
       - DB_PATH=/app/data/db.sqlite
     volumes:
       # Persist SQLite database (mount the data directory to avoid file/directory issues)
@@ -24,12 +30,12 @@ services:
           "CMD",
           "deno",
           "eval",
-          "try { await fetch('http://localhost:3001'); Deno.exit(0); } catch { Deno.exit(1); }",
+          "try { await fetch('http://localhost:3001/health'); Deno.exit(0); } catch { Deno.exit(1); }",
         ]
       interval: 30s
       timeout: 3s
       retries: 3
-      start_period: 5s
+      start_period: 10s
 
 volumes:
   data:
