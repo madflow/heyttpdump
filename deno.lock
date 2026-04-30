@@ -12,7 +12,7 @@
     "jsr:@std/path@1.0": "1.0.9",
     "jsr:@std/path@^1.1.4": "1.1.4",
     "npm:@deno/vite-plugin@^1.0.5": "1.0.6_vite@7.3.1__picomatch@4.0.3",
-    "npm:@lucide/svelte@~0.563.1": "0.563.1_svelte@5.50.1__acorn@8.15.0",
+    "npm:@lucide/svelte@0.577": "0.577.0_svelte@5.50.1__acorn@8.15.0",
     "npm:@orpc/client@^1.13.4": "1.13.4",
     "npm:@orpc/contract@^1.13.4": "1.13.4",
     "npm:@orpc/server@^1.13.4": "1.13.4",
@@ -237,8 +237,8 @@
         "@jridgewell/sourcemap-codec"
       ]
     },
-    "@lucide/svelte@0.563.1_svelte@5.50.1__acorn@8.15.0": {
-      "integrity": "sha512-Kt+MbnE5D9RsuI/csmf7M+HWxALe57x3A0DhQ8pPnnUpneh7zuldrYjlT+veWtk+tVnp5doQtaAAxLujzIlhBw==",
+    "@lucide/svelte@0.577.0_svelte@5.50.1__acorn@8.15.0": {
+      "integrity": "sha512-0P6mkySd2MapIEgq08tADPmcN4DHndC/02PWwaLkOerXlx5Sv9aT4BxyXLIY+eccr0g/nEyCYiJesqS61YdBZQ==",
       "dependencies": [
         "svelte"
       ]
@@ -1113,7 +1113,7 @@
       "apps/kit": {
         "dependencies": [
           "npm:@deno/vite-plugin@^1.0.5",
-          "npm:@lucide/svelte@~0.563.1",
+          "npm:@lucide/svelte@0.577",
           "npm:@orpc/client@^1.13.4",
           "npm:@orpc/contract@^1.13.4",
           "npm:@sveltejs/adapter-node@^5.2.12",
