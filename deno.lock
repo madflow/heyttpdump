@@ -12,7 +12,7 @@
     "jsr:@std/path@1.0": "1.0.9",
     "jsr:@std/path@^1.1.4": "1.1.4",
     "npm:@deno/vite-plugin@^1.0.5": "1.0.6_vite@7.3.1__picomatch@4.0.3",
-    "npm:@lucide/svelte@0.577": "0.577.0_svelte@5.50.1__acorn@8.15.0",
+    "npm:@lucide/svelte@1": "1.14.0_svelte@5.50.1__acorn@8.15.0",
     "npm:@orpc/client@^1.13.4": "1.13.4",
     "npm:@orpc/contract@^1.13.4": "1.13.4",
     "npm:@orpc/server@^1.13.4": "1.13.4",
@@ -256,8 +256,8 @@
         "@jridgewell/sourcemap-codec"
       ]
     },
-    "@lucide/svelte@0.577.0_svelte@5.50.1__acorn@8.15.0": {
-      "integrity": "sha512-0P6mkySd2MapIEgq08tADPmcN4DHndC/02PWwaLkOerXlx5Sv9aT4BxyXLIY+eccr0g/nEyCYiJesqS61YdBZQ==",
+    "@lucide/svelte@1.14.0_svelte@5.50.1__acorn@8.15.0": {
+      "integrity": "sha512-MVuP5VRCBQa2OaIpaRbuEV4k5OV2dy9MyxA6Tf4Sz/IN0v3zzUU72ObHc9r2Zn/wSMXDg6lLrHrczqI7w7gCzQ==",
       "dependencies": [
         "svelte"
       ]
@@ -453,10 +453,10 @@
         "@rollup/pluginutils",
         "commondir",
         "estree-walker",
-        "fdir",
+        "fdir@6.5.0_picomatch@4.0.3",
         "is-reference@1.2.1",
         "magic-string",
-        "picomatch@4.0.3",
+        "picomatch",
         "rollup"
       ],
       "optionalPeers": [
@@ -492,7 +492,7 @@
       "dependencies": [
         "@types/estree",
         "estree-walker",
-        "picomatch@4.0.3",
+        "picomatch",
         "rollup"
       ],
       "optionalPeers": [
@@ -896,12 +896,15 @@
       "integrity": "sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w=="
     },
     "fdir@6.5.0_picomatch@4.0.3": {
+      "integrity": "sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg=="
+    },
+    "fdir@6.5.0_picomatch@4.0.4": {
       "integrity": "sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==",
       "dependencies": [
-        "picomatch@4.0.3"
+        "picomatch"
       ],
       "optionalPeers": [
-        "picomatch@4.0.3"
+        "picomatch"
       ]
     },
     "fsevents@2.3.3": {
@@ -1128,22 +1131,11 @@
     "picocolors@1.1.1": {
       "integrity": "sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA=="
     },
-    "picomatch@4.0.3": {
-      "integrity": "sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q=="
-    },
     "picomatch@4.0.4": {
       "integrity": "sha512-QP88BAKvMam/3NxH6vj2o21R6MjxZUAd6nlwAS/pnGvN9IVLocLHxGYIzFhg6fUQ+5th6P4dv4eW9jX3DSIj7A=="
     },
     "postcss@8.5.13": {
       "integrity": "sha512-qif0+jGGZoLWdHey3UFHHWP0H7Gbmsk8T5VEqyYFbWqPr1XqvLGBbk/sl8V5exGmcYJklJOhOQq1pV9IcsiFag==",
-      "dependencies": [
-        "nanoid",
-        "picocolors",
-        "source-map-js"
-      ]
-    },
-    "postcss@8.5.6": {
-      "integrity": "sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==",
       "dependencies": [
         "nanoid",
         "picocolors",
@@ -1278,18 +1270,11 @@
     "tapable@2.3.0": {
       "integrity": "sha512-g9ljZiwki/LfxmQADO3dEY1CbpmXT5Hm2fJ+QaGKwSXUylMybePR7/67YW7jOrrvjEgL1Fmz5kzyAjWVWLlucg=="
     },
-    "tinyglobby@0.2.15_picomatch@4.0.3": {
-      "integrity": "sha512-j2Zq4NyQYG5XMST4cbs02Ak8iJUdxRM0XI5QyxXuZOzKOINmWurp3smXu3y5wDcJrptwpSjgXHzIQxR0omXljQ==",
-      "dependencies": [
-        "fdir",
-        "picomatch@4.0.3"
-      ]
-    },
     "tinyglobby@0.2.16": {
       "integrity": "sha512-pn99VhoACYR8nFHhxqix+uvsbXineAasWm5ojXoN8xEwK5Kd3/TrhNn1wByuD52UxWRLy8pu+kRMniEi6Eq9Zg==",
       "dependencies": [
-        "fdir",
-        "picomatch@4.0.4"
+        "fdir@6.5.0_picomatch@4.0.4",
+        "picomatch"
       ]
     },
     "totalist@3.0.1": {
@@ -1315,11 +1300,11 @@
       "integrity": "sha512-w+N7Hifpc3gRjZ63vYBXA56dvvRlNWRczTdmCBBa+CotUzAPf5b7YMdMR/8CQoeYE5LX3W4wj6RYTgonm1b9DA==",
       "dependencies": [
         "esbuild",
-        "fdir",
-        "picomatch@4.0.3",
-        "postcss@8.5.6",
+        "fdir@6.5.0_picomatch@4.0.3",
+        "picomatch",
+        "postcss",
         "rollup",
-        "tinyglobby@0.2.15_picomatch@4.0.3"
+        "tinyglobby"
       ],
       "optionalDependencies": [
         "fsevents"
@@ -1330,10 +1315,10 @@
       "integrity": "sha512-rZuUu9j6J5uotLDs+cAA4O5H4K1SfPliUlQwqa6YEwSrWDZzP4rhm00oJR5snMewjxF5V/K3D4kctsUTsIU9Mw==",
       "dependencies": [
         "lightningcss@1.32.0",
-        "picomatch@4.0.4",
-        "postcss@8.5.13",
+        "picomatch",
+        "postcss",
         "rolldown",
-        "tinyglobby@0.2.16"
+        "tinyglobby"
       ],
       "optionalDependencies": [
         "fsevents"
@@ -1375,7 +1360,7 @@
       "apps/kit": {
         "dependencies": [
           "npm:@deno/vite-plugin@^1.0.5",
-          "npm:@lucide/svelte@0.577",
+          "npm:@lucide/svelte@1",
           "npm:@orpc/client@^1.13.4",
           "npm:@orpc/contract@^1.13.4",
           "npm:@sveltejs/adapter-node@^5.2.12",
