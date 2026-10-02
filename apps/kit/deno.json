@@ -9,7 +9,7 @@
   },
   "imports": {
     "@sveltejs/adapter-node": "npm:@sveltejs/adapter-node@^5.2.12",
-    "@sveltejs/kit": "npm:@sveltejs/kit@^2.50.2",
+    "@sveltejs/kit": "npm:@sveltejs/kit@^3.0.0",
     "@sveltejs/vite-plugin-svelte": "npm:@sveltejs/vite-plugin-svelte@^7.0.0",
     "svelte": "npm:svelte@^5.49.2",
     "vite": "npm:vite@^8.0.0",
