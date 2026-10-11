@@ -1,8 +1,8 @@
 <script lang="ts">
   import MethodBadge from "./MethodBadge.svelte";
   import RequestDetails from "./RequestDetails.svelte";
-  import { getPathFromUrl } from "$lib/utils";
-  import type { Request } from "$lib/types";
+  import { getPathFromUrl } from "#lib/utils.ts";
+  import type { Request } from "#lib/types.ts";
 
   let {
     request,
@@ -19,9 +19,7 @@
   } = $props();
 </script>
 
-<div
-  class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded p-4"
->
+<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded p-4">
   <div class="flex items-center justify-between">
     <div class="flex items-center gap-4 flex-1">
       <MethodBadge method={request.payload.method} />
@@ -50,9 +48,6 @@
   </div>
 
   {#if isExpanded}
-    <RequestDetails
-      headers={request.payload.headers}
-      body={request.payload.body}
-    />
+    <RequestDetails headers={request.payload.headers} body={request.payload.body} />
   {/if}
 </div>

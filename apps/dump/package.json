@@ -1,0 +1,19 @@
+{
+  "name": "@repo/dump",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "dev": "tsx watch --include '../../packages/orpc/dist/**/*.js' main.ts",
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "start": "node dist/main.js"
+  },
+  "dependencies": {
+    "@hono/node-server": "2.1.4",
+    "@repo/orpc": "workspace:*",
+    "hono": "4.13.13"
+  }
+}

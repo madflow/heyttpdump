@@ -1,9 +1,13 @@
 import { ORPCError, implement } from "@orpc/server";
 
 import { appContract } from "@repo/orpc";
-import * as db from "./db.ts";
+import type { RequestRepository } from "./request-repository.ts";
 
-const impl = implement(appContract);
+export interface ApiContext {
+  repository: RequestRepository;
+}
+
+const impl = implement(appContract).$context<ApiContext>();
 
 // Helper to validate request existence
 function ensureRequestExists<T>(result: T | null, errorMessage = "Request not found"): T {
@@ -13,25 +17,25 @@ function ensureRequestExists<T>(result: T | null, errorMessage = "Request not fo
   return result;
 }
 
-const createRequest = impl.requests.create.handler(({ input }) => 
-  db.createRequest(input.payload)
+const createRequest = impl.requests.create.handler(({ input, context }) =>
+  context.repository.createRequest(input.payload),
 );
 
-const deleteRequest = impl.requests.delete.handler(({ input }) => {
-  ensureRequestExists(db.deleteRequest(input.id));
+const deleteRequest = impl.requests.delete.handler(async ({ input, context }) => {
+  ensureRequestExists(await context.repository.deleteRequest(input.id));
   return true;
 });
 
-const getRequest = impl.requests.get.handler(({ input }) => 
-  ensureRequestExists(db.getRequest(input.id))
+const getRequest = impl.requests.get.handler(async ({ input, context }) =>
+  ensureRequestExists(await context.repository.getRequest(input.id)),
 );
 
-const listRequests = impl.requests.list.handler(({ input }) => 
-  db.listRequests(input.limit, input.offset)
+const listRequests = impl.requests.list.handler(({ input, context }) =>
+  context.repository.listRequests(input.limit, input.offset),
 );
 
-const deleteAllRequests = impl.requests.deleteAll.handler(() => 
-  db.deleteAllRequests()
+const deleteAllRequests = impl.requests.deleteAll.handler(({ context }) =>
+  context.repository.deleteAllRequests(),
 );
 
 export const router = {

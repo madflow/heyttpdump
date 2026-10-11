@@ -1,41 +1,33 @@
-# In order to run this makefile, you need to install the following tools:
-# make 
-# Node.Js 22 or higher
-# see https://github.com/nvm-sh/nvm for a battle tested way to install Node.Js
-# npm (which comes with Node.Js)
+# Requires Node.js 24 LTS and the pnpm version pinned in package.json.
 SHELL = /bin/sh
-UID := $(shell id -u)
-GID := $(shell id -g)
-SYSTEM := $(shell uname -s)
-PROCESSOR := $(shell uname -p)
 
-.PHONY: help
-help: ## shows this help
-	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_\-\.]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+.PHONY: help init dev check build test docker-up docker-down docker-logs
+help: ## show commands
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_\-]+:.*?## / {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-.PHONY: init
-init: ## initialize the project
-	@deno task migrate
+init: ## install dependencies and initialize the database
+	pnpm install --frozen-lockfile
+	pnpm migrate
 
+dev: ## start API, dump and frontend watchers
+	pnpm dev
 
-.PHONY: dev
-dev: ## start development server
-	@deno task dev
+check: ## lint, format-check and type-check
+	pnpm lint
+	pnpm format:check
+	pnpm check
 
-.PHONY: check
-check: ## checking and linting
-	@deno lint
+build: ## build all production outputs
+	pnpm build
 
-.PHONY: docker-up
-docker-up: ## start the project with docker
-	@docker-compose up -d --build --remove-orphans
+test: ## build and run isolated tests
+	pnpm test
 
-.PHONY: docker-down
-docker-down: ## stop the project with docker
-	@docker-compose down
+docker-up: ## start the container
+	docker compose up -d --build --remove-orphans
 
-.PHONY: docker-logs
-docker-logs: ## view the project logs with docker
-	@docker-compose logs -f
+docker-down: ## stop the container
+	docker compose down
 
-
+docker-logs: ## follow container logs
+	docker compose logs -f

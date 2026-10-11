@@ -2,5 +2,34 @@
   "name": "heyttpdump-kit",
   "version": "0.0.1",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "imports": {
+    "#lib": "./src/lib/index.ts",
+    "#lib/*": "./src/lib/*"
+  },
+  "scripts": {
+    "dev": "vite --port 3002",
+    "build": "vite build",
+    "preview": "vite preview --port 3002",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "start": "node build/index.js"
+  },
+  "dependencies": {
+    "@repo/orpc": "workspace:*"
+  },
+  "devDependencies": {
+    "@lucide/svelte": "1.55.0",
+    "@opentelemetry/api": "1.9.1",
+    "@sveltejs/adapter-node": "6.0.0",
+    "@sveltejs/kit": "3.0.1",
+    "@sveltejs/vite-plugin-svelte": "7.3.1",
+    "@tailwindcss/vite": "4.3.3",
+    "svelte": "5.57.2",
+    "svelte-check": "4.7.6",
+    "tailwindcss": "4.3.3",
+    "vite": "8.3.4"
+  }
 }

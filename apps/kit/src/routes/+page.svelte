@@ -1,16 +1,12 @@
 <script lang="ts">
-  import { browser } from "$app/environment";
-  import type { Request } from "$lib/types";
-  import {
-    deleteAllRequests,
-    deleteRequest,
-    fetchRequests,
-  } from "$lib/api";
-  import Header from "$lib/components/Header.svelte";
-  import RequestList from "$lib/components/RequestList.svelte";
-  import Pagination from "$lib/components/Pagination.svelte";
-  import LoadingState from "$lib/components/LoadingState.svelte";
-  import EmptyState from "$lib/components/EmptyState.svelte";
+  import { browser } from "$app/env";
+  import type { Request } from "#lib/types.ts";
+  import { deleteAllRequests, deleteRequest, fetchRequests } from "#lib/api.ts";
+  import Header from "#lib/components/Header.svelte";
+  import RequestList from "#lib/components/RequestList.svelte";
+  import Pagination from "#lib/components/Pagination.svelte";
+  import LoadingState from "#lib/components/LoadingState.svelte";
+  import EmptyState from "#lib/components/EmptyState.svelte";
 
   const REQUESTS_PER_PAGE = 10;
   const POLLING_INTERVAL_MS = 1000;
@@ -30,10 +26,7 @@
 
   async function loadRequests() {
     try {
-      const data = await fetchRequests(
-        REQUESTS_PER_PAGE,
-        page * REQUESTS_PER_PAGE,
-      );
+      const data = await fetchRequests(REQUESTS_PER_PAGE, page * REQUESTS_PER_PAGE);
       requests = data;
     } catch (error) {
       console.error("Failed to fetch requests:", error);
@@ -62,9 +55,7 @@
   }
 
   async function handleDeleteAll() {
-    const confirmed = confirm(
-      "Are you sure you want to delete all requests?",
-    );
+    const confirmed = confirm("Are you sure you want to delete all requests?");
     if (!confirmed) return;
 
     try {
@@ -93,11 +84,7 @@
 
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
   <div class="max-w-6xl mx-auto p-6">
-    <Header
-      requestsCount={requests.length}
-      {loading}
-      onDeleteAll={handleDeleteAll}
-    />
+    <Header requestsCount={requests.length} {loading} onDeleteAll={handleDeleteAll} />
 
     {#if !mounted}
       <LoadingState />
