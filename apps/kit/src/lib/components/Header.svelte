@@ -13,9 +13,7 @@
 </script>
 
 <div class="mb-6 flex items-center justify-between">
-  <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
-    HTTP Requests
-  </h1>
+  <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">HTTP Requests</h1>
   <div class="flex items-center gap-4">
     <ThemeToggle />
     <button

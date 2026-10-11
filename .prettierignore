@@ -1,0 +1,8 @@
+node_modules
+**/dist
+**/build
+**/.svelte-kit
+**/.vite
+data
+.opencode
+pnpm-lock.yaml

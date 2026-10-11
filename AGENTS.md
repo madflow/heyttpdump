@@ -1,326 +1,109 @@
 # Agent Guidelines for heyttpdump
 
-This document provides coding guidelines and commands for AI agents working on this codebase.
+## Project
 
-## Project Overview
+TypeScript/Node.js 24 LTS monorepo with pnpm workspaces:
 
-**heyttpdump** is a TypeScript/Deno monorepo for capturing and viewing HTTP requests. It consists of:
-- **apps/api** - Backend API server (port 3001) with oRPC handlers and SQLite database
-- **apps/dump** - HTTP dump service (port 3000) that captures incoming requests
-- **apps/kit** - SvelteKit frontend (port 3002) for viewing captured requests
-- **packages/orpc** - Shared RPC contract and type-safe client
+- `apps/api`: Hono/oRPC API on port 3001, Node SQLite repository.
+- `apps/dump`: Hono HTTP capture service on port 3000.
+- `apps/kit`: SvelteKit 3 / Svelte 5 frontend on port 3002.
+- `packages/orpc`: shared contracts and type-safe client (`@repo/orpc`).
 
-**Tech Stack:** Deno 2.0+, TypeScript, Hono, SvelteKit, Svelte 5, Vite 7, Tailwind CSS 4, SQLite, oRPC, Valibot
+Other tools: Vite 8, Tailwind CSS 4, Valibot, TypeScript 6, ESLint, Prettier.
+Exact versions and exceptions are recorded in `docs/dependency-audit.md`.
+Use `.node-version` and the `packageManager` pin in `package.json`.
+Do not include unrelated `.opencode` tooling in the application workspace.
 
-## Build, Lint, and Test Commands
+## Commands (repository root)
 
-### Development
-```bash
-# Start all services in development mode
-deno task dev           # or: make dev
-
-# Start individual services
-deno task dev:api       # API server only
-deno task dev:dump      # Dump server only
-deno task dev:kit       # SvelteKit UI only
-
-# Initialize project (run migrations)
-make init
+```sh
+pnpm install --frozen-lockfile
+pnpm migrate                 # or make init (also installs)
+pnpm dev                     # or make dev
+pnpm dev:api
+pnpm dev:dump
+pnpm dev:kit
+pnpm build
+pnpm start                   # compiled production stack, build first
+pnpm --filter heyttpdump-kit preview
+pnpm lint
+pnpm format:check
+pnpm format
+pnpm check                   # TS + svelte-check
+pnpm test                    # build + Node test runner
+make docker-up
+make docker-down
+make docker-logs
 ```
 
-### Build
-```bash
-# Build frontend for production
-deno task --cwd=apps/kit build
+Workspace migrations/API commands default to `apps/api/db.sqlite`; Docker uses
+`/app/data/db.sqlite` via `DB_PATH`. Never test against the user's database.
+Tests use temporary databases and isolated ports. Docker smoke tests use disposable volumes.
 
-# Preview production build
-deno task --cwd=apps/kit preview
-```
+## Code conventions
 
-### Linting and Formatting
-```bash
-# Run linter
-deno lint               # or: make check
+- Two-space indentation, double quotes, semicolons, trailing commas; Prettier governs formatting.
+- External imports, then workspace imports, then relative imports.
+- Retain `.ts` extensions in relative TypeScript source imports; NodeNext builds rewrite to `.js`.
+- API/dump/shared production output goes in `dist/`; shared package exports target compiled output.
+- Frontend imports use `#lib/*` (with file extensions), not the removed SvelteKit `$lib` alias.
+- Use `interface` for object shapes and `type` for unions; export public types.
+- Avoid `any`; use `unknown` and narrowing. Enable strict TS and `checkJs`.
+- camelCase variables/functions, PascalCase types/components, SCREAMING_SNAKE_CASE constants.
+- Utilities use kebab-case filenames; Svelte components use PascalCase.
+- Keep helpers small and modules focused. Prefer existing files over unnecessary new abstractions.
 
-# Format code
-deno fmt                # Formats TS, JS, JSON, MD files
-```
+## Svelte 5 and frontend
 
-### Database
-```bash
-# Run migrations
-deno task migrate
+- Use `$state`, `$derived`, `$effect`, and typed `$props`, not legacy stores.
+- Effects performing polling must clear intervals on teardown.
+- Use try/catch for async operations; log failures and preserve user-facing behavior.
+- Components live in `apps/kit/src/lib/components/`.
+- Keep browser helpers in `lib/utils.ts`, HTTP proxy helpers in `lib/api.ts`, and theme logic
+  in `lib/theme.svelte.ts`.
+- SvelteKit 3 configuration belongs in `vite.config.ts`. Use `$app/env` for browser detection.
+- Keep `API_URL` server-only and runtime-configurable; never expose it through public Vite defines.
+- Preserve existing frontend proxy endpoints. Their backend communication is through oRPC.
 
-# Database location: data/db.sqlite (or DB_PATH env var)
-```
+## API and database
 
-### Testing
-**Note:** No test framework is currently configured. Consider adding tests using Deno's built-in test framework.
+Use a contract-first workflow:
 
-### Docker
-```bash
-make docker-up          # Start with Docker
-make docker-down        # Stop containers
-make docker-logs        # View logs
-```
+1. Define Valibot schemas and oRPC contracts in `packages/orpc/contract/index.ts`.
+2. Implement handlers in `apps/api/router.ts`.
+3. Consume the type-safe client (`client.requests.*`).
 
-## Code Style Guidelines
+Preserve public contract shapes and NOT_FOUND behavior. Use `ORPCError` for API errors.
+Business operations go through oRPC, not new direct HTTP routes. Health/readiness routes,
+existing frontend proxy routes, and the dump capture service are intentional exceptions.
 
-### Imports
+`apps/api/request-repository.ts` is the async, runtime-neutral repository interface.
+Handlers access `context.repository` and await get/delete results before testing for null.
+`apps/api/app.ts` constructs the Hono app with an injected repository; neither app nor router
+may import Node-specific startup, SQLite, filesystem APIs, or environment configuration.
 
-**Order:** External dependencies → workspace packages → relative imports
-```typescript
-// External dependencies
-import { Hono } from "hono";
-import { cors } from "hono/cors";
+`apps/api/db.ts` owns Node SQLite operations, parameterized SQL, and row conversion.
+Its explicit factory returns a repository and a separate close function. No import-time
+connection is allowed. Readiness delegates to `repository.checkReady()`.
+The Promise interface does not make synchronous SQLite operations nonblocking.
+Migrations remain idempotent and close their explicitly opened database in `finally`.
 
-// Workspace packages
-import { appContract } from "@repo/orpc";
+The boundary is preparation for a future D1 adapter, not a Cloudflare deployment.
+Do not add an ORM, D1 bindings, Wrangler, Workers, or synchronization as part of routine
+Node maintenance. A future D1 database would be separate from local SQLite.
 
-// Relative imports
-import * as db from "./db.ts";
-```
+## Runtime and delivery
 
-**Import aliases:**
-- `@repo/orpc` - Shared oRPC package
-- Use `.ts` extensions for all relative imports
+Node entry points own environment parsing, `@hono/node-server`, and shutdown.
+Drain requests before closing the API database. `scripts/start.mjs` supervises production
+services, migrates, awaits readiness, forwards shutdown, and exits on child failure.
+Explicit frontend `PORT` takes precedence over `WEB_PORT`.
 
-### Formatting
+Use Node 24 Debian Trixie-slim containers pinned by patch and manifest digest.
+Pin exact direct dependencies and pnpm; use frozen lockfiles in CI/Docker.
+Verify published versions, engine/peer compatibility, and security before upgrades.
+Keep pnpm supply-chain defaults; allow only necessary dependency build scripts.
+Never suppress peer conflicts or silently downgrade the container distribution.
 
-- **Indentation:** 2 spaces (no tabs)
-- **Line length:** No strict limit, but keep reasonable (~100-120 chars)
-- **Quotes:** Double quotes for strings
-- **Semicolons:** Required (Deno default)
-- **Trailing commas:** Use in multiline objects/arrays
-- Run `deno fmt` before committing
-
-### TypeScript and Types
-
-**Type definitions:**
-- Export types for public APIs
-- Define interfaces for data structures
-- Use `type` for union types, `interface` for objects
-
-```typescript
-// Database types
-export interface PayloadInput {
-  method: string;
-  url: string;
-  headers: Record<string, string>;
-  body: string;
-}
-
-// Export router type for type inference
-export type AppRouter = typeof router;
-```
-
-**Type safety:**
-- Enable `checkJs: true` for JavaScript files
-- Use type annotations for function parameters and return types
-- Avoid `any` - use `unknown` when type is uncertain
-- Use Valibot schemas for runtime validation
-
-### Naming Conventions
-
-**Files:**
-- `kebab-case.ts` for utilities
-- `PascalCase.svelte` for components
-- `lowercase.ts` for main entry points (main.ts, router.ts, db.ts)
-
-**Variables and functions:**
-```typescript
-// camelCase for variables and functions
-const DEFAULT_PORT = 3001;
-let expandedId = $state<number | null>(null);
-
-function ensureRequestExists<T>(result: T | null): T { }
-
-// PascalCase for components and types
-type AppContract = typeof appContract;
-```
-
-**Constants:**
-- SCREAMING_SNAKE_CASE for top-level constants
-```typescript
-const REQUESTS_PER_PAGE = 10;
-const POLLING_INTERVAL_MS = 1000;
-```
-
-### Svelte 5 Patterns
-
-**Use Svelte 5 runes (NOT stores):**
-```typescript
-// State management with runes
-let requests = $state<Request[]>([]);
-let page = $state(0);
-let loading = $state(false);
-
-// Effects
-$effect(() => {
-  if (!mounted) return;
-  fetchRequests();
-  return () => clearInterval(interval);
-});
-
-// Derived state (when needed)
-let totalCount = $derived(requests.length);
-```
-
-**Component props:**
-```typescript
-// Props with types
-let { requests, expandedId, loading, onDelete } = $props<{
-  requests: Request[];
-  expandedId: number | null;
-  loading: boolean;
-  onDelete: (id: number) => void;
-}>();
-```
-
-### Error Handling
-
-**Backend (oRPC):**
-- Use `ORPCError` for API errors with appropriate error codes
-```typescript
-import { ORPCError } from "@orpc/server";
-
-function ensureRequestExists<T>(result: T | null, errorMessage = "Request not found"): T {
-  if (!result) {
-    throw new ORPCError("NOT_FOUND", { message: errorMessage });
-  }
-  return result;
-}
-```
-
-**Frontend:**
-- Use try-catch for async operations
-- Log errors to console
-- Show user-friendly messages (consider adding toast notifications)
-```typescript
-try {
-  await client.requests.delete({ id });
-  await fetchRequests();
-} catch (error) {
-  console.error('Failed to delete request:', error);
-}
-```
-
-**Database:**
-- Return `null` for not found, throw for unexpected errors
-- Use `RETURNING *` for INSERT/DELETE operations
-
-### RPC and API Design
-
-**Contract-first approach:**
-1. Define schemas in `packages/orpc/contract/index.ts` using Valibot
-2. Implement handlers in `apps/api/router.ts`
-3. Use type-safe client in frontend via `client.requests.*`
-
-```typescript
-// 1. Define contract
-const getRequestContract = oc
-  .input(idInputSchema)
-  .output(requestSchema);
-
-// 2. Implement handler
-const getRequest = impl.requests.get.handler(({ input }) => 
-  ensureRequestExists(db.getRequest(input.id))
-);
-
-// 3. Use in frontend
-const data = await client.requests.get({ id: 123 });
-```
-
-**All API operations go through oRPC** - no direct HTTP endpoints except RPC
-
-### Database Operations
-
-- All database operations in `apps/api/db.ts`
-- Use prepared statements with parameterized queries
-- Transform database rows to application types
-```typescript
-function rowToOutput(row: RequestRow): RequestOutput {
-  return {
-    id: row.id,
-    createdAt: row.created_at,
-    payload: { /* ... */ },
-  };
-}
-```
-
-### Component Structure
-
-**Svelte components:**
-```svelte
-<script lang="ts">
-  // Imports
-  import Component from './Component.svelte';
-  
-  // Props
-  let { prop1, prop2 } = $props<{ prop1: string; prop2: number }>();
-  
-  // State
-  let localState = $state(0);
-  
-  // Effects
-  $effect(() => { /* ... */ });
-  
-  // Functions
-  function handleAction() { /* ... */ }
-</script>
-
-<!-- Template -->
-<div class="tailwind-classes">
-  {#if condition}
-    <!-- content -->
-  {:else}
-    <!-- fallback -->
-  {/if}
-</div>
-```
-
-**Component organization:** `apps/kit/src/lib/components/` - one component per file
-
-## Common Patterns
-
-### Environment Variables
-```typescript
-const PORT = Number(Deno.env.get("API_PORT")) || DEFAULT_PORT;
-const dbPath = Deno.env.get("DB_PATH") || DEFAULT_DB_PATH;
-```
-
-### Polling Pattern
-```typescript
-$effect(() => {
-  if (!mounted) return;
-  
-  fetchData();
-  const interval = setInterval(fetchData, INTERVAL_MS);
-  
-  return () => clearInterval(interval);
-});
-```
-
-### Helper Functions
-- Keep pure utility functions in `lib/utils.ts`
-- Keep API client in `lib/api.ts`
-- Keep theme logic in `lib/theme.svelte.ts`
-
-## Key Principles
-
-1. **Type Safety:** Leverage end-to-end type safety through oRPC contracts
-2. **Svelte 5 First:** Use runes (`$state`, `$effect`) instead of legacy stores
-3. **Single Responsibility:** Each module has a clear, focused purpose
-4. **Contract-First:** Define RPC contracts before implementation
-5. **Error Boundaries:** Handle errors gracefully at appropriate levels
-6. **Consistent Formatting:** Run `deno fmt` and `deno lint` before commits
-7. **No Direct HTTP:** All backend communication through oRPC (except dump service)
-
-## File References
-
-When making changes, prefer editing existing files:
-- Backend routes: `apps/api/router.ts`
-- Database operations: `apps/api/db.ts`
-- RPC contracts: `packages/orpc/contract/index.ts`
-- Frontend page: `apps/kit/src/routes/+page.svelte`
-- Components: `apps/kit/src/lib/components/*.svelte`
+Run lint, formatting validation, type checks, tests, and production builds before delivery.
+Document checks that could not run. CI audits dependencies and scans images before publishing.

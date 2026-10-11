@@ -24,21 +24,13 @@ const paginationInputSchema = v.object({
 });
 
 // Contract definitions
-const createRequestContract = oc
-  .input(payloadInputSchema)
-  .output(requestSchema);
+const createRequestContract = oc.input(payloadInputSchema).output(requestSchema);
 
-const deleteRequestContract = oc
-  .input(idInputSchema)
-  .output(v.boolean());
+const deleteRequestContract = oc.input(idInputSchema).output(v.boolean());
 
-const getRequestContract = oc
-  .input(idInputSchema)
-  .output(requestSchema);
+const getRequestContract = oc.input(idInputSchema).output(requestSchema);
 
-const listRequestsContract = oc
-  .input(paginationInputSchema)
-  .output(v.array(requestSchema));
+const listRequestsContract = oc.input(paginationInputSchema).output(v.array(requestSchema));
 
 const deleteAllRequestsContract = oc.output(v.number());
 

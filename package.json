@@ -1,0 +1,39 @@
+{
+  "name": "heyttpdump",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.11.2",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @repo/orpc build && concurrently --kill-others -n shared,api,dump,kit \"pnpm --filter @repo/orpc dev\" \"pnpm --filter @repo/api dev\" \"pnpm --filter @repo/dump dev\" \"pnpm --filter heyttpdump-kit dev\"",
+    "dev:api": "pnpm --filter @repo/orpc build && concurrently --kill-others \"pnpm --filter @repo/orpc dev\" \"pnpm --filter @repo/api dev\"",
+    "dev:dump": "pnpm --filter @repo/orpc build && concurrently --kill-others \"pnpm --filter @repo/orpc dev\" \"pnpm --filter @repo/dump dev\"",
+    "dev:kit": "pnpm --filter @repo/orpc build && concurrently --kill-others \"pnpm --filter @repo/orpc dev\" \"pnpm --filter heyttpdump-kit dev\"",
+    "build": "pnpm --filter @repo/orpc build && pnpm --filter @repo/api --filter @repo/dump --filter heyttpdump-kit build",
+    "migrate": "pnpm --filter @repo/api migrate",
+    "start": "node scripts/start.mjs",
+    "check": "pnpm --filter @repo/orpc --filter @repo/api --filter @repo/dump build && pnpm -r check && tsc -p tests/tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "pnpm build && tsc -p tests/tsconfig.json && node --test tests/dist/*.test.js"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@orpc/client": "1.15.5",
+    "@repo/orpc": "workspace:*",
+    "@types/node": "24.19.2",
+    "concurrently": "10.0.6",
+    "eslint": "10.12.0",
+    "eslint-plugin-svelte": "3.23.1",
+    "globals": "17.13.0",
+    "prettier": "3.9.10",
+    "prettier-plugin-svelte": "4.1.1",
+    "svelte": "5.57.2",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.1"
+  }
+}

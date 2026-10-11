@@ -34,9 +34,7 @@ function applyThemeToDocument(isDark: boolean): void {
 }
 
 export function setupThemeContext() {
-  let theme = $state<Theme>(
-    (localStorage.getItem(STORAGE_KEY) as Theme) || "system",
-  );
+  let theme = $state<Theme>((localStorage.getItem(STORAGE_KEY) as Theme) || "system");
   let resolvedTheme = $state<"light" | "dark">(THEME_CLASS_LIGHT);
 
   $effect(() => {

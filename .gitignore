@@ -1,15 +1,23 @@
-# dotenv environment variable files
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
-
-# Fresh build directory
-_fresh/
-# npm + other dependencies
+# Local configuration and dependencies
+.env
+.env.*
+!.env.example
 node_modules/
-vendor/
 
-apps/api/db.sqlite
-data/db.sqlite
-apps/kit/.vite
+# Generated artifacts
+**/dist/
+**/build/
+**/.svelte-kit/
+**/.vite/
+coverage/
+*.tsbuildinfo
+
+# Persistent data (never commit request captures)
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+data/
+
+.DS_Store
+*.log

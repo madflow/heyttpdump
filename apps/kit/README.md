@@ -1,45 +1,24 @@
-# sv
+# heyttpdump frontend
 
-Everything you need to build a Svelte project, powered by
-[`sv`](https://github.com/sveltejs/cli).
+SvelteKit 3 / Svelte 5 with Vite 8, Tailwind CSS 4 and adapter-node.
 
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
+Run commands from the repository root:
 
 ```sh
-# create a new project
-npx sv create my-app
+pnpm install --frozen-lockfile
+pnpm dev:kit
+pnpm build
+pnpm --filter heyttpdump-kit preview
+pnpm --filter heyttpdump-kit check
 ```
 
-To recreate this project with the same configuration:
+Development and preview use port 3002. The API must be running separately, or use
+`pnpm dev` to start the complete stack.
 
-```sh
-# recreate this project
-deno run npm:sv create --template minimal --types ts --install deno kit
-```
+Production: `PORT=3002 node apps/kit/build/index.js`, or `pnpm start` for all services.
+`API_URL` is private server-side runtime configuration, defaulting to
+`http://localhost:3001/rpc`.
 
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or
-`pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an
-> [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+SvelteKit configuration is in `vite.config.ts`; `#lib/*` imports are declared in
+`package.json`. Components use Svelte 5 runes. See the root README for deployment,
+database, and environment details.

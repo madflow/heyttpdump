@@ -1,6 +1,6 @@
 <script lang="ts">
   import RequestItem from "./RequestItem.svelte";
-  import type { Request } from "$lib/types";
+  import type { Request } from "#lib/types.ts";
 
   let {
     requests,
