@@ -1,7 +1,7 @@
 # Requires Node.js 24 LTS and the pnpm version pinned in package.json.
 SHELL = /bin/sh
 
-.PHONY: help init dev check build test docker-up docker-down docker-logs
+.PHONY: help init dev dev-cloudflare preview-cloudflare check build test docker-up docker-down docker-logs
 help: ## show commands
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_\-]+:.*?## / {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
@@ -11,6 +11,12 @@ init: ## install dependencies and initialize the database
 
 dev: ## start API, dump and frontend watchers
 	pnpm dev
+
+dev-cloudflare: ## start local Workers, D1 and frontend hot reload
+	pnpm cloudflare:dev
+
+preview-cloudflare: ## preview the built frontend on local Workers and D1
+	pnpm cloudflare:preview
 
 check: ## lint, format-check and type-check
 	pnpm lint

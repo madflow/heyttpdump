@@ -1,0 +1,9 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "heyttpdump-dump",
+  "main": "worker.ts",
+  "compatibility_date": "2026-04-01",
+  "workers_dev": true,
+  "preview_urls": true,
+  "services": [{ "binding": "API", "service": "heyttpdump-api" }],
+}

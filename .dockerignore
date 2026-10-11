@@ -7,6 +7,10 @@
 **/build
 **/.svelte-kit
 **/.vite
+.cloudflare
+**/.wrangler
+**/.dev.vars
+**/.dev.vars.*
 **/coverage
 **/*.sqlite*
 **/*.db*

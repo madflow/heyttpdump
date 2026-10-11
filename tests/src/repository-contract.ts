@@ -9,7 +9,7 @@ export const payload = {
   body: '{"hello":"world"}',
 };
 
-/** Reuse this suite with a future D1 adapter and its isolated test database. */
+/** Shared contract for temporary Node SQLite and isolated Cloudflare D1 databases. */
 export function repositoryContract(
   name: string,
   setup: () => Promise<{

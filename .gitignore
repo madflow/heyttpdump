@@ -10,6 +10,10 @@ node_modules/
 **/.svelte-kit/
 **/.vite/
 coverage/
+.cloudflare/
+**/.wrangler/
+.dev.vars
+.dev.vars.*
 *.tsbuildinfo
 
 # Persistent data (never commit request captures)

@@ -6,3 +6,6 @@ node_modules
 data
 .opencode
 pnpm-lock.yaml
+.cloudflare
+**/.wrangler
+**/worker-configuration.d.ts

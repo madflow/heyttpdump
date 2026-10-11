@@ -1,14 +1,14 @@
 import type { RequestHandler } from "./$types";
-import { createClient } from "@repo/orpc";
-
-const API_URL = process.env.API_URL || "http://localhost:3001/rpc";
-const client = createClient(API_URL);
+import { getApiClient } from "#lib/server/api.ts";
 
 export const GET: RequestHandler = async ({ url }) => {
   const limit = parseInt(url.searchParams.get("limit") || "10");
   const offset = parseInt(url.searchParams.get("offset") || "0");
 
+  let apiUrl: string | undefined;
   try {
+    const { client, url } = getApiClient();
+    apiUrl = url;
     const requests = await client.requests.list({ limit, offset });
     return Response.json(requests);
   } catch (error) {
@@ -25,7 +25,7 @@ export const GET: RequestHandler = async ({ url }) => {
       {
         error: "Failed to connect to backend API",
         details: errorMessage,
-        apiUrl: API_URL,
+        apiUrl,
       },
       { status: isConnectionError ? 503 : 500 },
     );
@@ -34,6 +34,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
 export const DELETE: RequestHandler = async () => {
   try {
+    const { client } = getApiClient();
     const deletedCount = await client.requests.deleteAll();
     return Response.json({ deletedCount });
   } catch (error) {

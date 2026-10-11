@@ -4,8 +4,10 @@ import { RPCLink } from "@orpc/client/fetch";
 
 import { appContract, type AppContract } from "../contract/index.ts";
 
-export function createClient(url: string) {
-  const link = new RPCLink({ url });
+export type RpcFetch = (request: Request, init: RequestInit) => Promise<Response>;
+
+export function createClient(url: string, fetch?: RpcFetch) {
+  const link = new RPCLink({ url, fetch });
   return createORPCClient(link) as ContractRouterClient<typeof appContract>;
 }
 

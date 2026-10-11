@@ -1,50 +1,8 @@
 import { DatabaseSync, type SQLOutputValue } from "node:sqlite";
 import type { RequestOutput, RequestRepository } from "./request-repository.ts";
+import { rowToOutput } from "./request-row.ts";
 
 type Row = Record<string, SQLOutputValue>;
-
-function stringColumn(row: Row, key: string): string {
-  const value = row[key];
-  if (typeof value !== "string") throw new Error(`Invalid database column: ${key}`);
-  return value;
-}
-
-function parseHeaders(value: string): Record<string, string> {
-  try {
-    const parsed: unknown = JSON.parse(value);
-    if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
-      throw new Error("Headers must be an object");
-    }
-    const headers: Record<string, string> = {};
-    for (const [key, value] of Object.entries(parsed)) {
-      if (typeof value !== "string") throw new Error("Header values must be strings");
-      Object.defineProperty(headers, key, {
-        value,
-        enumerable: true,
-        configurable: true,
-        writable: true,
-      });
-    }
-    return headers;
-  } catch (error) {
-    console.error("Failed to parse headers:", error);
-    return {};
-  }
-}
-
-function rowToOutput(row: Row): RequestOutput {
-  if (typeof row.id !== "number") throw new Error("Invalid database ID");
-  return {
-    id: row.id,
-    createdAt: stringColumn(row, "created_at"),
-    payload: {
-      method: stringColumn(row, "method"),
-      url: stringColumn(row, "url"),
-      headers: parseHeaders(stringColumn(row, "headers")),
-      body: stringColumn(row, "body"),
-    },
-  };
-}
 
 function toOutputOrNull(row: Row | undefined): RequestOutput | null {
   return row ? rowToOutput(row) : null;

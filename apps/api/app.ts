@@ -5,8 +5,7 @@ import { RPCHandler } from "@orpc/server/fetch";
 import { router } from "./router.ts";
 import type { RequestRepository } from "./request-repository.ts";
 
-export function createApp(repository: RequestRepository) {
-  const startedAt = Date.now();
+export function createApp(repository: RequestRepository, startedAt = Date.now()) {
   const handler = new RPCHandler(router, {
     interceptors: [onError((error) => console.error("RPC Error:", error))],
   });
