@@ -70,8 +70,8 @@ exercise capture → D1 → frontend → deletion through real local service bin
 Wrangler migration tracking and repeat application are also checked. Generated
 binding declarations are checked in; rerun `cloudflare:types` after changing configs.
 The type-generation script omits Wrangler's conditional import of the generated
-frontend entry point so clean and built checkouts produce identical declarations
-and `checkJs` does not follow compiled adapter output. Wrangler state and bundle
+frontend entry point and its source hash so clean and built checkouts produce
+identical declarations and `checkJs` does not follow compiled adapter output. Wrangler state and bundle
 artifacts are ignored.
 
 The default `pnpm build` still selects adapter-node and writes `apps/kit/build`.
