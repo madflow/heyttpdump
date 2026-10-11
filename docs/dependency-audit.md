@@ -103,8 +103,8 @@ GitHub Actions are updated to current release commits, not stale major tags:
 checkout 7.0.1, setup-node 7.1.0, pnpm/action-setup 6.1.0,
 setup-buildx-action 4.4.1, login-action 4.6.0, metadata-action 6.2.0,
 build-push-action 7.4.0, cosign-installer 4.1.2, and trivy-action 0.36.0.
-Cosign is 3.1.3 and Trivy is 0.75.0. Dependabot checks npm, Actions and Docker weekly;
-Node major upgrades remain excluded to preserve the chosen runtime line.
+Cosign is 3.1.3 and Trivy is 0.75.0. Dependency updates are maintained manually;
+retain Node 24 to preserve the chosen runtime line.
 
 ## Security and verification
 
