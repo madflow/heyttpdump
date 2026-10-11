@@ -11,7 +11,7 @@ export interface RequestOutput {
   payload: PayloadInput;
 }
 
-/** Runtime-neutral boundary; async adapters such as D1 can implement this later. */
+/** Runtime-neutral boundary shared by Node SQLite and Cloudflare D1 adapters. */
 export interface RequestRepository {
   createRequest(payload: PayloadInput): Promise<RequestOutput>;
   getRequest(id: number): Promise<RequestOutput | null>;

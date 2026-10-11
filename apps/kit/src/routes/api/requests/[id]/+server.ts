@@ -1,8 +1,5 @@
 import type { RequestHandler } from "./$types";
-import { createClient } from "@repo/orpc";
-
-const API_URL = process.env.API_URL || "http://localhost:3001/rpc";
-const client = createClient(API_URL);
+import { getApiClient } from "#lib/server/api.ts";
 
 export const DELETE: RequestHandler = async ({ params }) => {
   const id = parseInt(params.id);
@@ -12,6 +9,7 @@ export const DELETE: RequestHandler = async ({ params }) => {
   }
 
   try {
+    const { client } = getApiClient();
     await client.requests.delete({ id });
     return Response.json({ success: true });
   } catch (error) {

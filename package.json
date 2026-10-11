@@ -12,6 +12,15 @@
     "dev:dump": "pnpm --filter @repo/orpc build && concurrently --kill-others \"pnpm --filter @repo/orpc dev\" \"pnpm --filter @repo/dump dev\"",
     "dev:kit": "pnpm --filter @repo/orpc build && concurrently --kill-others \"pnpm --filter @repo/orpc dev\" \"pnpm --filter heyttpdump-kit dev\"",
     "build": "pnpm --filter @repo/orpc build && pnpm --filter @repo/api --filter @repo/dump --filter heyttpdump-kit build",
+    "cloudflare:types": "node scripts/cloudflare-types.mjs",
+    "cloudflare:build": "pnpm --filter @repo/orpc build && DEPLOY_TARGET=cloudflare pnpm --filter heyttpdump-kit build && wrangler deploy -c apps/api/wrangler.jsonc --dry-run --outdir ../../.cloudflare/api && wrangler deploy -c apps/dump/wrangler.jsonc --dry-run --outdir ../../.cloudflare/dump",
+    "cloudflare:dry-run": "pnpm cloudflare:build && wrangler deploy -c apps/kit/wrangler.jsonc --dry-run --outdir ../../.cloudflare/kit",
+    "cloudflare:dev": "pnpm cloudflare:migrate:local && pnpm --filter @repo/orpc build && concurrently --kill-others -n shared,api,dump,kit \"pnpm --filter @repo/orpc dev\" \"wrangler dev -c apps/api/wrangler.jsonc --port 8787 --inspector-port 9230 --persist-to .cloudflare/state\" \"wrangler dev -c apps/dump/wrangler.jsonc --port 8788 --inspector-port 9231 --persist-to .cloudflare/state\" \"DEPLOY_TARGET=cloudflare pnpm --filter heyttpdump-kit exec vite --port 8789 --strictPort\"",
+    "cloudflare:preview": "pnpm cloudflare:migrate:local && pnpm cloudflare:build && concurrently --kill-others -n api,dump,kit \"wrangler dev -c apps/api/wrangler.jsonc --port 8787 --inspector-port 9230 --persist-to .cloudflare/state\" \"wrangler dev -c apps/dump/wrangler.jsonc --port 8788 --inspector-port 9231 --persist-to .cloudflare/state\" \"wrangler dev -c apps/kit/wrangler.jsonc --port 8789 --inspector-port 9232 --persist-to .cloudflare/state\"",
+    "cloudflare:migrate:local": "wrangler d1 migrations apply DB -c apps/api/wrangler.jsonc --local --persist-to .cloudflare/state",
+    "cloudflare:migrate:remote": "wrangler d1 migrations apply DB -c apps/api/wrangler.jsonc --remote",
+    "cloudflare:deploy": "pnpm cloudflare:build && wrangler deploy -c apps/api/wrangler.jsonc && wrangler deploy -c apps/dump/wrangler.jsonc && wrangler deploy -c apps/kit/wrangler.jsonc",
+    "cloudflare:test": "pnpm build && tsc -p tests/tsconfig.json && pnpm cloudflare:dry-run && node --test tests/cloudflare/*.test.mjs",
     "migrate": "pnpm --filter @repo/api migrate",
     "start": "node scripts/start.mjs",
     "check": "pnpm --filter @repo/orpc --filter @repo/api --filter @repo/dump build && pnpm -r check && tsc -p tests/tsconfig.json --noEmit",
@@ -21,6 +30,7 @@
     "test": "pnpm build && tsc -p tests/tsconfig.json && node --test tests/dist/*.test.js"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "5.20261006.1",
     "@eslint/js": "10.0.1",
     "@orpc/client": "1.15.5",
     "@repo/orpc": "workspace:*",
@@ -29,11 +39,13 @@
     "eslint": "10.12.0",
     "eslint-plugin-svelte": "3.23.1",
     "globals": "17.13.0",
+    "miniflare": "5.20261006.1-alpha",
     "prettier": "3.9.10",
     "prettier-plugin-svelte": "4.1.1",
     "svelte": "5.57.2",
     "tsx": "4.23.15",
     "typescript": "6.0.3",
-    "typescript-eslint": "8.71.1"
+    "typescript-eslint": "8.71.1",
+    "wrangler": "4.149.0"
   }
 }

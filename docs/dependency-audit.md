@@ -42,6 +42,34 @@ Its non-stable API status in Node 24 is an explicit accepted choice; do not assu
 shown in Node 25/26 documentation exist in Node 24. Only DatabaseSync, prepare, get,
 all, exec and close are used here.
 
+## Optional Cloudflare target
+
+Verified against npm metadata on **2026-10-11**:
+
+- `@sveltejs/adapter-cloudflare` **8.0.0** peers require SvelteKit `^3.0.0-next.0`
+  and Wrangler `^4.118.0`; selected SvelteKit **3.0.1** and Wrangler **4.149.0**
+  satisfy them without peer overrides. Node 24 satisfies Wrangler's Node `>=22`
+  engine. The Cloudflare build was verified with Vite **8.3.4**.
+- Miniflare **5.20261006.1-alpha** is pinned to the exact version required by
+  Wrangler **4.149.0**, rather than independently upgrading the test runtime.
+  This prerelease is an explicit toolchain compatibility exception. Tests use its
+  exported `convertV4MiniflareOptions` migration helper.
+- `@cloudflare/workers-types` **5.20261006.1** matches the selected runtime release
+  and avoids adding a minimum-release-age exception for the newer type package.
+  Wrangler generates the checked-in binding declarations without duplicated runtime types.
+- `workerd` is the only additional dependency allowed to run an install script;
+  its installer validates the platform-specific runtime executable. Existing pnpm
+  supply-chain defaults and strict engine/peer checks are retained.
+- On Node **24.21.0**, frozen installation, lint, formatting, type checks, eight
+  Node tests, eleven Cloudflare tests, both production build targets, and Wrangler
+  deployment dry runs passed. Local Wrangler capture-to-UI smoke checks and repeat
+  migrations passed. A post-install audit reported no known vulnerabilities.
+  The pinned Docker image build and isolated container persistence/restart smoke
+  test also passed after the local daemon became available. Cloudflare dev mode
+  was verified without a prebuilt frontend: Vite HMR client, page render, capture,
+  listing, and deletion all worked through local bindings. Remote provisioning,
+  migrations, and deployment were intentionally not performed.
+
 ## Compatibility changes
 
 - SvelteKit 3 configuration moved into the Vite plugin; `svelte.config.ts` was removed.

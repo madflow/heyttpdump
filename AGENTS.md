@@ -31,6 +31,10 @@ pnpm format:check
 pnpm format
 pnpm check                   # TS + svelte-check
 pnpm test                    # build + Node test runner
+pnpm cloudflare:test         # Node build + Worker builds/dry runs + isolated D1 tests
+pnpm cloudflare:dev          # local Workers/D1 + frontend HMR + shared watch
+pnpm cloudflare:preview      # built frontend on local Workers/D1, no remote deployment
+pnpm cloudflare:types        # regenerate checked-in binding types
 make docker-up
 make docker-down
 make docker-logs
@@ -88,9 +92,13 @@ connection is allowed. Readiness delegates to `repository.checkReady()`.
 The Promise interface does not make synchronous SQLite operations nonblocking.
 Migrations remain idempotent and close their explicitly opened database in `finally`.
 
-The boundary is preparation for a future D1 adapter, not a Cloudflare deployment.
-Do not add an ORM, D1 bindings, Wrangler, Workers, or synchronization as part of routine
-Node maintenance. A future D1 database would be separate from local SQLite.
+An explicitly requested optional Cloudflare target now uses three Workers and D1.
+`apps/api/d1.ts` implements the same repository boundary; Node `db.ts` stays separate.
+Worker entry points own bindings; app/router remain runtime-neutral. Keep API Workers
+private and use service bindings for oRPC. D1 and local SQLite are separate databases,
+without synchronization or an ORM. Never provision, migrate remotely, or deploy without
+explicit authorization. See `docs/cloudflare.md` for commands and runtime differences.
+Keep default Node/Docker behavior unchanged when maintaining the Cloudflare target.
 
 ## Runtime and delivery
 

@@ -63,17 +63,20 @@ API and dump bind to `0.0.0.0`. Frontend `API_URL` is server-only and read at ru
 so changing it does not require rebuilding. These services are unauthenticated; do not
 expose captures to an untrusted network without an access-control layer.
 
-### Cloudflare preparation
+### Cloudflare Workers (optional)
 
-`apps/api/request-repository.ts` defines the asynchronous database interface injected
-into the oRPC context. `apps/api/db.ts` implements it using `node:sqlite`.
-The Hono app factory and router do not depend on Node startup or SQLite imports.
-SQLite operations remain synchronous internally despite the Promise interface.
-Node 24's built-in SQLite API is accepted with its documented non-stable status.
+An additive deployment runs three Workers (private API, public capture, public UI)
+and a separate D1 database. Node/Docker remain the default. The capture Worker enforces
+a 256 KiB streamed body limit; Node capture remains uncapped. SQLite and D1 do not sync.
 
-This is **not a Cloudflare deployment**. A future D1 adapter, migrations, bindings,
-and Worker entry points are separate work. Local SQLite and D1 would be separate
-databases without automatic synchronization. No ORM is required.
+Run `pnpm cloudflare:dev` (or `make dev-cloudflare`) for local Workers/D1 and frontend
+hot reload; the UI is at `http://localhost:8789` and capture at `http://localhost:8788`.
+Use `pnpm cloudflare:preview` for a production-like local Worker preview.
+
+See [Cloudflare deployment](docs/cloudflare.md) for local development, provisioning,
+migrations, deployment, verification, and the unauthenticated-access warning.
+The shared async repository boundary supports both adapters; Node SQLite operations
+remain synchronous internally. No ORM is used.
 
 ## Docker
 
