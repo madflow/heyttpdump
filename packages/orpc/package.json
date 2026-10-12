@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@orpc/client": "1.15.5",
-    "@orpc/contract": "1.15.5",
+    "@orpc/contract": "1.15.6",
     "valibot": "1.5.0"
   }
 }
