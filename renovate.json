@@ -1,0 +1,23 @@
+{
+  "assignees": ["madflow"],
+  "extends": ["config:recommended"],
+  "internalChecksFilter": "strict",
+  "labels": ["dependencies"],
+  "lockFileMaintenance": {
+    "automerge": false,
+    "enabled": true
+  },
+  "minimumReleaseAge": "2 days",
+  "osvVulnerabilityAlerts": true,
+  "packageRules": [
+    {
+      "automerge": false,
+      "matchPackageNames": ["*"]
+    }
+  ],
+  "prConcurrentLimit": 3,
+  "prHourlyLimit": 1,
+
+  "rangeStrategy": "bump",
+  "timezone": "Europe/Berlin"
+}
