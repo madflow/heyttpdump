@@ -4,7 +4,7 @@ HTTP request capture and viewing tool built with Node.js, TypeScript, Hono, and 
 
 ## Quick start
 
-Install **Node.js 24 LTS** (the tested patch is in `.node-version`) and **pnpm 12.11.2**:
+Install **Node.js 26** nd **pnpm 12.11.2**:
 
 ```sh
 npm install --global pnpm@12.11.2
@@ -15,9 +15,9 @@ pnpm dev
 
 Or use `make init` followed by `make dev`.
 
-- Web UI: http://localhost:3002
-- API: http://localhost:3001 (`/rpc`, `/health`, `/ready`)
-- Dump: http://localhost:3000 — send any HTTP request here to capture it.
+- Web UI: <http://localhost:3002>
+- API: <http://localhost:3001> (`/rpc`, `/health`, `/ready`)
+- Dump: <http://localhost:3000> — send any HTTP request here to capture it.
 
 ```sh
 curl -X POST 'http://localhost:3000/example?hello=world' \
