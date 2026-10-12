@@ -40,6 +40,7 @@ jobs:
         with:
           version: v0.75.0
           image-ref: heyttpdump:test
+          skip-dirs: "**/node_modules"
           scanners: vuln
           severity: HIGH,CRITICAL
           exit-code: "1"
