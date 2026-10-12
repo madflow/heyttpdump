@@ -11,7 +11,7 @@ TypeScript/Node.js 24 LTS monorepo with pnpm workspaces:
 
 Other tools: Vite 8, Tailwind CSS 4, Valibot, TypeScript 6, ESLint, Prettier.
 Exact versions and exceptions are recorded in `docs/dependency-audit.md`.
-Use `.node-version` and the `packageManager` pin in `package.json`.
+Use the `engines.node` version and the `packageManager` pin in `package.json`.
 Do not include unrelated `.opencode` tooling in the application workspace.
 
 ## Commands (repository root)
