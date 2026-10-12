@@ -114,4 +114,4 @@ Keep pnpm supply-chain defaults; allow only necessary dependency build scripts.
 Never suppress peer conflicts or silently downgrade the container distribution.
 
 Run lint, formatting validation, type checks, tests, and production builds before delivery.
-Document checks that could not run. CI audits dependencies and scans images before publishing.
+Document checks that could not run. CI audits dependencies and smoke-tests images before publishing.
