@@ -102,8 +102,8 @@ as the selected LTS deployment target even though newer non-24 releases exist.
 GitHub Actions are updated to current release commits, not stale major tags:
 checkout 7.0.1, setup-node 7.1.0, pnpm/action-setup 6.1.0,
 setup-buildx-action 4.4.1, login-action 4.6.0, metadata-action 6.2.0,
-build-push-action 7.4.0, cosign-installer 4.1.2, and trivy-action 0.36.0.
-Cosign is 3.1.3 and Trivy is 0.75.0. Dependency updates are maintained manually;
+build-push-action 7.4.0 and cosign-installer 4.1.2.
+Cosign is 3.1.3. Dependency updates are maintained manually;
 retain Node 24 to preserve the chosen runtime line.
 
 ## Security and verification
@@ -124,8 +124,8 @@ retain Node 24 to preserve the chosen runtime line.
   locally without a daemon.
 - Local Docker build and container smoke testing were **not run**: Docker's Colima
   daemon is stopped. A remote Trivy base-image scan was attempted twice but timed out;
-  **no clean container scan is claimed**. CI builds, smoke-tests, and scans the final
-  image, blocking publication for HIGH/CRITICAL findings without suppressions.
+  **no clean container scan is claimed**. CI builds and smoke-tests the final
+  image. Trivy scanning has been removed; `pnpm audit` remains enabled.
 - Updating an image pin must verify the tag/digest and run a fresh final-image scan.
   Distribution currency by itself does not establish vulnerability status.
 

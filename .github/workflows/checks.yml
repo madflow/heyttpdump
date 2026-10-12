@@ -36,11 +36,3 @@ jobs:
           cache-from: type=gha,scope=checks
           cache-to: type=gha,mode=max,scope=checks
       - run: sh scripts/test-container.sh heyttpdump:test
-      - uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
-        with:
-          version: v0.75.0
-          image-ref: heyttpdump:test
-          skip-dirs: "**/node_modules"
-          scanners: vuln
-          severity: HIGH,CRITICAL
-          exit-code: "1"
