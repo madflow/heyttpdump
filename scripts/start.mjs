@@ -79,7 +79,7 @@ try {
     if (!stopping) {
       if (!ready) throw new Error("API failed to become ready");
       launch("dump", "apps/dump/", "dist/main.js");
-      launch("frontend", "apps/kit/", "build/index.js");
+      launch("frontend", "apps/web/", "dist/node/main.js");
     }
   }
 } catch (error) {

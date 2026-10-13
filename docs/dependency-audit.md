@@ -1,133 +1,102 @@
 # Dependency verification
 
-Verified against npm's published `latest` metadata, Node's release index, Docker Registry
-manifests, and GitHub release/tag metadata on **2026-10-11**. Exact direct versions are
-pinned in manifests; `pnpm-lock.yaml` records resolved transitive dependencies and integrity.
-Documentation search alone was not treated as authoritative for published versions.
+## TanStack Start migration (2026-10-13)
 
-## Application stack
+Frontend versions were verified against npm's published metadata, engines, and peers.
+**`@tanstack/react-start` is pinned to exactly `1.169.1` as requested**, not the
+latest available Start release. Its published dependencies select React Router
+`1.170.44`; that matching version is pinned directly. The installed package and
+lockfile must retain Start 1.169.1. No peer overrides or ignored conflicts are used.
 
-| Package / tool                              | Selected version                    |
-| ------------------------------------------- | ----------------------------------- |
-| Node.js (latest Node 24 LTS patch)          | 24.21.0                             |
-| pnpm (latest stable)                        | 12.11.2                             |
-| Hono / Node server adapter                  | 4.13.13 / 2.1.4                     |
-| oRPC client / contract / server             | 1.15.5 (aligned)                    |
-| Valibot                                     | 1.5.0 (stable, replaces beta)       |
-| Svelte / SvelteKit                          | 5.57.2 / 3.0.1                      |
-| SvelteKit adapter-node / Vite Svelte plugin | 6.0.0 / 7.3.1                       |
-| Vite                                        | 8.3.4                               |
-| Tailwind CSS / Vite plugin                  | 4.3.3 (aligned)                     |
-| Lucide Svelte                               | 1.55.0                              |
-| OpenTelemetry API (SvelteKit peer)          | 1.9.1                               |
-| TypeScript                                  | 6.0.3 — compatibility exception     |
-| Node type declarations                      | 24.19.2 — runtime-aligned exception |
-| tsx / concurrently                          | 4.23.15 / 10.0.6                    |
-| ESLint / @eslint/js / typescript-eslint     | 10.12.0 / 10.0.1 / 8.71.1           |
-| eslint-plugin-svelte / globals              | 3.23.1 / 17.13.0                    |
-| Prettier / Svelte plugin                    | 3.9.10 / 4.1.1                      |
-| svelte-check                                | 4.7.6                               |
+| Package / tool                              | Selected version                                                       |
+| ------------------------------------------- | ---------------------------------------------------------------------- |
+| Node.js / pnpm                              | 26.11.1 / 12.11.2 (unchanged)                                          |
+| TanStack React Start / Router               | 1.169.1 / 1.170.44                                                     |
+| TanStack Router generator                   | 1.167.43 (matches Start's plugin dependency)                           |
+| React / React DOM / corresponding types     | 19.3.0 (aligned)                                                       |
+| React Vite plugin                           | 6.1.2                                                                  |
+| Cloudflare Vite plugin                      | 1.63.1                                                                 |
+| Vite / Tailwind CSS and plugin              | 8.3.4 / 4.3.3 (unchanged)                                              |
+| Lucide React                                | 1.56.0                                                                 |
+| Vitest / jsdom                              | 5.0.4 / 30.1.2                                                         |
+| React Testing Library / DOM Testing Library | 16.3.3 / 10.4.2                                                        |
+| TypeScript / Node declarations              | 6.0.3 / 24.19.2 (unchanged)                                            |
+| Hono / Node server adapter                  | 4.13.13 / 2.1.4 (unchanged)                                            |
+| oRPC / Valibot                              | 1.15.5 / 1.5.0 (unchanged)                                             |
+| ESLint / typescript-eslint / Prettier       | 10.12.0 / 8.71.1 / 3.9.10 (unchanged)                                  |
+| Wrangler / Miniflare / Workers types        | 4.149.0 / 5.20261006.1-alpha / 5.20261011.1 (upstream update retained) |
 
-All selected packages were non-deprecated according to npm metadata. The only entries
-reported by `pnpm outdated -r` are intentional:
+Start 1.169.1 requires Node >=22.12.0 and Vite >=8.0.0; the repository's Node 26
+and Vite 8 satisfy those constraints. React plugin 6 peers with Vite 8. Cloudflare
+plugin 1.63.1 accepts Vite 8 and Wrangler 4.149.0. React Testing Library accepts
+React 19; Vitest and jsdom support Node 26. TypeScript 6 remains pinned to satisfy
+typescript-eslint's supported range. The existing Node 24 declaration package is
+retained conservatively; it does **not** mean the runtime is Node 24.
 
-- TypeScript's latest is **7.0.2**, but SvelteKit 3 requires `^6.0.0`, svelte-check
-  accepts TS 5/6, and typescript-eslint requires `<6.1.0`. **6.0.3** is the newest
-  published stable release satisfying all three; peer constraints are not bypassed.
-- `@types/node` latest targets Node 26. **24.19.2** is the latest published Node 24
-  type package, matching the explicitly chosen Node 24 LTS runtime.
+Svelte, its adapters, icons, checker, and ESLint/Prettier plugins were removed.
+Node runtime imports are production dependencies. Node production uses Hono's
+fetch bridge instead of introducing Nitro. Cloudflare production uses Start's
+fetch entry with the Cloudflare Vite plugin and its generated Wrangler configuration.
 
-Node `node:sqlite` replaces the Deno JSR SQLite driver with no external native driver.
-Its non-stable API status in Node 24 is an explicit accepted choice; do not assume APIs
-shown in Node 25/26 documentation exist in Node 24. Only DatabaseSync, prepare, get,
-all, exec and close are used here.
+## Supply chain and security
 
-## Optional Cloudflare target
+Exact direct pins, strict engines/peers, frozen CI/Docker installation, and pnpm's
+supply-chain defaults remain enabled. No blanket build approvals were added.
+The existing `allowBuilds` policy permits esbuild and workerd only. pnpm 12 records
+version-specific minimum-release-age exclusions for the selected newly published
+Start/Router, Vitest, and Lucide packages; these are not wildcard policy bypasses.
+Package-provided agent skills were not approved or installed.
 
-Verified against npm metadata on **2026-10-11**:
+`pnpm audit` and `pnpm audit --prod` reported **no known vulnerabilities** after
+installation. This is an advisory-database result, not proof of absence of defects.
+Miniflare's pinned alpha version remains an explicit compatibility exception
+matching Wrangler. Tests use its exported v4-to-v5 conversion helper with an
+explicit module list for the multi-module frontend Worker.
 
-- `@sveltejs/adapter-cloudflare` **8.0.0** peers require SvelteKit `^3.0.0-next.0`
-  and Wrangler `^4.118.0`; selected SvelteKit **3.0.1** and Wrangler **4.149.0**
-  satisfy them without peer overrides. Node 24 satisfies Wrangler's Node `>=22`
-  engine. The Cloudflare build was verified with Vite **8.3.4**.
-- Miniflare **5.20261006.1-alpha** is pinned to the exact version required by
-  Wrangler **4.149.0**, rather than independently upgrading the test runtime.
-  This prerelease is an explicit toolchain compatibility exception. Tests use its
-  exported `convertV4MiniflareOptions` migration helper.
-- `@cloudflare/workers-types` **5.20261006.1** matches the selected runtime release
-  and avoids adding a minimum-release-age exception for the newer type package.
-  Wrangler generates the checked-in binding declarations without duplicated runtime types.
-- `workerd` is the only additional dependency allowed to run an install script;
-  its installer validates the platform-specific runtime executable. Existing pnpm
-  supply-chain defaults and strict engine/peer checks are retained.
-- On Node **24.21.0**, frozen installation, lint, formatting, type checks, eight
-  Node tests, eleven Cloudflare tests, both production build targets, and Wrangler
-  deployment dry runs passed. Local Wrangler capture-to-UI smoke checks and repeat
-  migrations passed. A post-install audit reported no known vulnerabilities.
-  The pinned Docker image build and isolated container persistence/restart smoke
-  test also passed after the local daemon became available. Cloudflare dev mode
-  was verified without a prebuilt frontend: Vite HMR client, page render, capture,
-  listing, and deletion all worked through local bindings. Remote provisioning,
-  migrations, and deployment were intentionally not performed.
+## Runtime and containers
 
-## Compatibility changes
-
-- SvelteKit 3 configuration moved into the Vite plugin; `svelte.config.ts` was removed.
-- `$lib` imports became package-defined `#lib` imports with extensions;
-  `$app/environment` became `$app/env`; `json()` became `Response.json()`.
-- Frontend tsconfig now extends `$app/tsconfig` and type-checks without emitting.
-- DELETE helpers identify themselves as JSON API requests rather than form-style
-  requests with no content type. SvelteKit 3 keeps CSRF protection enabled. Browser
-  cross-origin JSON requests require CORS preflight; no trusted-origin wildcard was added.
-- Adapter-node 6 assumes HTTPS when reconstructing origins without a protocol header.
-  Behind a trusted reverse proxy, configure `PROTOCOL_HEADER`, `HOST_HEADER`, and
-  `PORT_HEADER` as appropriate and ensure the proxy replaces untrusted forwarded headers.
-  SvelteKit 3 removed runtime `ORIGIN`; an explicit canonical origin belongs in
-  `sveltekit({ paths: { origin: ... } })` configuration.
-- pnpm 12 workspace settings use `allowBuilds`; only esbuild (used by tsx) is allowed
-  to execute installation scripts. No blanket build-script approval or peer-ignore flag.
-
-## Containers and CI
-
-Both stages use **Debian Trixie**, not Bookworm or an ambiguous Debian alias:
+The repository already used Node 26 at migration time. The upstream exact engine
+pin to 26.11.1 and Workers types update to 5.20261011.1 were retained when rebasing.
+The runtime, package-manager pin, and Docker base image were not upgraded or downgraded:
 
 ```text
-node:24.21.0-trixie-slim
-sha256:173f125896c3b47ddf056734c7ea789d04595a6a08769a8f78e0df642781fb66
+node:26.11.1-trixie-slim
+sha256:193fe51b64e77981119c98c2002c9e32a70e2f006fb4d25068ce0558998917f0
 ```
 
-The tag exists and the digest is its multi-platform manifest digest. Node 24 is retained
-as the selected LTS deployment target even though newer non-24 releases exist.
+Both stages remain Debian Trixie slim. CI continues dependency auditing, image
+building, and disposable-volume smoke tests before publishing. No new container
+vulnerability scan result is claimed by this migration.
 
-GitHub Actions are updated to current release commits, not stale major tags:
-checkout 7.0.1, setup-node 7.1.0, pnpm/action-setup 6.1.0,
-setup-buildx-action 4.4.1, login-action 4.6.0, metadata-action 6.2.0,
-build-push-action 7.4.0 and cosign-installer 4.1.2.
-Cosign is 3.1.3. Dependency updates are maintained manually;
-retain Node 24 to preserve the chosen runtime line.
+## Compatibility and verification
 
-## Security and verification
+- `apps/web`, `heyttpdump-web`, and `dev:web` replace the old frontend names.
+- Start 1.169.1 file-based server routes preserve the existing proxy URLs and
+  response/error shapes, including proxy HTTP 500 for backend `NOT_FOUND`.
+- Destructive requests explicitly require JSON and reject mismatched supplied
+  origins. Runtime `API_URL` and Worker bindings remain server-only.
+- Separate `dist/node` and `dist/cloudflare` outputs prevent cross-target overwrites.
+  Generated route types are recreated for clean-checkout type checks.
+- Tests cover Node integration and supervisor lifecycle, isolated Worker/D1 calls,
+  React polling/cleanup/races/deletion/body rendering, and theme/storage behavior.
+- Remote provisioning, migrations, deployments, and old-Worker removal are not
+  performed. Database tests use isolated data, not the user's database.
 
-- `pnpm audit --json`: **zero reported vulnerabilities** at all severity levels in
-  application and development dependencies. This is an advisory-database result,
-  not proof that no vulnerabilities exist.
-- Installation uses strict engines, strict peer compatibility, exact pins, and frozen
-  lockfiles in CI/Docker. pnpm's default supply-chain policies remain enabled.
-- On Node **24.21.0**: frozen installation, production build, type checks, lint,
-  formatting checks, and **all eight automated tests passed**. The downloaded Node
-  archive's SHA-256 matched Node's published checksum.
-- Manual smoke checks passed for `pnpm dev` (capture, frontend proxy, Ctrl+C shutdown)
-  and an isolated production-only installation (compiled services, capture/proxy,
-  shutdown, no TypeScript compiler or runner installed). Installing the exact pnpm
-  pin through npm in an isolated prefix also succeeded.
-- Docker Compose configuration and entrypoint/smoke-test shell syntax can be checked
-  locally without a daemon.
-- Local Docker build and container smoke testing were **not run**: Docker's Colima
-  daemon is stopped. A remote Trivy base-image scan was attempted twice but timed out;
-  **no clean container scan is claimed**. CI builds and smoke-tests the final
-  image. Trivy scanning has been removed; `pnpm audit` remains enabled.
-- Updating an image pin must verify the tag/digest and run a fresh final-image scan.
-  Distribution currency by itself does not establish vulnerability status.
+### Migration check results
 
-Historical `.opencode` plans and its separate tooling package are outside application
-scope and were not rewritten, installed, or represented as audited dependencies.
+On Node 26.11.1 with pnpm 12.11.2, frozen installation, lint, formatting validation,
+strict type checks (including regenerating a deleted route tree), production builds,
+and all **10 React + 10 Node + 11 Cloudflare tests** passed. Cloudflare checks include
+both Worker builds and deployment dry runs; Node output remains available afterward.
+Binding type regeneration left API/dump declarations unchanged.
+
+The pinned Docker image built successfully and its disposable-volume smoke test
+passed capture/proxy, production-only dependency resolution, shutdown, and
+persistence across recreation. Node development and production preview, plus
+Cloudflare Vite HMR and built Worker preview, passed isolated capture/proxy smoke
+checks. Headless Chrome verified hydration without console errors and light/dark
+rendering on all four workflows; Node preview screenshots were visually inspected.
+SQLite/D1 data for these checks lived only in temporary directories or disposable
+volumes. No remote Cloudflare action or old-Worker deletion was performed.
+
+Historical `.opencode` tooling remains outside the application workspace and audit.

@@ -7,7 +7,8 @@ node_modules/
 # Generated artifacts
 **/dist/
 **/build/
-**/.svelte-kit/
+**/.tanstack/
+**/routeTree.gen.ts
 **/.vite/
 coverage/
 .cloudflare/

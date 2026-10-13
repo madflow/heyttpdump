@@ -1,4 +1,4 @@
-# Requires Node.js 24 LTS and the pnpm version pinned in package.json.
+# Requires Node.js 26 and the pnpm version pinned in package.json.
 SHELL = /bin/sh
 
 .PHONY: help init dev dev-cloudflare preview-cloudflare check build test docker-up docker-down docker-logs

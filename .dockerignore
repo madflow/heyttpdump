@@ -5,7 +5,8 @@
 **/node_modules
 **/dist
 **/build
-**/.svelte-kit
+**/.tanstack
+**/routeTree.gen.ts
 **/.vite
 .cloudflare
 **/.wrangler

@@ -24,7 +24,7 @@ jobs:
       - run: pnpm check
       - run: pnpm test
       - run: pnpm cloudflare:types
-      - run: git diff --exit-code -- apps/api/worker-configuration.d.ts apps/dump/worker-configuration.d.ts apps/kit/src/worker-configuration.d.ts
+      - run: git diff --exit-code -- apps/api/worker-configuration.d.ts apps/dump/worker-configuration.d.ts apps/web/src/worker-configuration.d.ts
       - run: pnpm cloudflare:test
       - run: pnpm audit --audit-level=high
       - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1

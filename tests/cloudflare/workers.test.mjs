@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { readdirSync } from "node:fs";
 import { test } from "node:test";
 import { Miniflare, convertV4MiniflareOptions } from "miniflare";
 import { unstable_readConfig } from "wrangler";
@@ -9,6 +10,14 @@ import { repositoryContract } from "../dist/repository-contract.js";
 
 const deleteHeaders = { "content-type": "application/json" };
 const common = { modules: true, compatibilityDate: "2026-04-01" };
+const webRoot = "apps/web/dist/cloudflare/server";
+const webModules = [
+  "server.js",
+  ...readdirSync(`${webRoot}/assets`)
+    .filter((name) => name.endsWith(".js"))
+    .map((name) => `assets/${name}`),
+].map((name) => ({ type: "ESModule", path: `${webRoot}/${name}` }));
+const webSource = { modules: webModules, modulesRoot: webRoot };
 const migration = await readFile(
   new URL("../../apps/api/migrations/0001_requests.sql", import.meta.url),
   "utf8",
@@ -20,6 +29,18 @@ function workers() {
       workers: [
         {
           ...common,
+          ...webSource,
+          name: "web",
+          compatibilityFlags: ["nodejs_compat"],
+          serviceBindings: { API: "api" },
+          assets: {
+            directory: "apps/web/dist/cloudflare/client",
+            binding: "ASSETS",
+            routerConfig: { has_user_worker: true },
+          },
+        },
+        {
+          ...common,
           name: "api",
           scriptPath: ".cloudflare/api/worker.js",
           d1Databases: { DB: "test-captures" },
@@ -29,14 +50,6 @@ function workers() {
           name: "dump",
           scriptPath: ".cloudflare/dump/worker.js",
           serviceBindings: { API: "api" },
-        },
-        {
-          ...common,
-          name: "kit",
-          scriptPath: ".cloudflare/kit/_worker.js",
-          compatibilityFlags: ["nodejs_compat"],
-          serviceBindings: { API: "api" },
-          assets: { directory: "apps/kit/.svelte-kit/cloudflare", binding: "ASSETS" },
         },
       ],
     }),
@@ -63,10 +76,19 @@ test("Worker service bindings: capture → D1 → frontend → deletion", async 
   await db.exec(migration.replaceAll("\n", " "));
   const api = await mf.getWorker("api");
   const dump = await mf.getWorker("dump");
-  const kit = await mf.getWorker("kit");
+  // dispatchFetch exercises the public gateway and allows browser Origin headers;
+  // getWorker's internal RPC bridge reserves/rejects those headers itself.
+  const web = { fetch: mf.dispatchFetch };
   const rpc = createClient("https://api.internal/rpc", (request) => api.fetch(request));
   assert.equal((await api.fetch("https://api.internal/ready")).status, 200);
-  assert.equal((await kit.fetch("https://kit.test/")).status, 200);
+  const shell = await web.fetch("https://web.test/");
+  assert.equal(shell.status, 200);
+  const html = await shell.text();
+  assert.match(html, /HTTP Requests/);
+  assert.match(html, /Loading\.\.\./);
+  for (const asset of html.matchAll(/(?:href|src)="([^" ]*\/assets\/[^" ]+\.(?:js|css|svg))"/g)) {
+    assert.equal((await web.fetch(new URL(asset[1], "https://web.test"))).status, 200);
+  }
 
   const response = await dump.fetch("https://capture.test/path?q=1", {
     method: "PATCH",
@@ -79,19 +101,31 @@ test("Worker service bindings: capture → D1 → frontend → deletion", async 
   assert.equal(request.payload.url, "https://capture.test/path?q=1");
   assert.equal(request.payload.headers["x-example"], "test");
   assert.equal(request.payload.body, "héllo 🌍");
-  const list = await kit.fetch("https://kit.test/api/requests?limit=1&offset=0");
+  const list = await web.fetch("https://web.test/api/requests?limit=1&offset=0");
   assert.equal(list.status, 200);
   assert.deepEqual(await list.json(), [request]);
-  const invalid = await kit.fetch("https://kit.test/api/requests/not-a-number", {
+  for (const path of ["/api/requests", `/api/requests/${request.id}`]) {
+    for (const headers of [
+      {},
+      { "content-type": "text/plain", origin: "https://web.test" },
+      { "content-type": "application/json", origin: "https://evil.test" },
+    ]) {
+      assert.equal(
+        (await web.fetch(`https://web.test${path}`, { method: "DELETE", headers })).status,
+        403,
+      );
+    }
+  }
+  const invalid = await web.fetch("https://web.test/api/requests/not-a-number", {
     method: "DELETE",
     headers: deleteHeaders,
   });
   assert.equal(invalid.status, 400, await invalid.text());
   assert.equal(
     (
-      await kit.fetch(`https://kit.test/api/requests/${request.id}`, {
+      await web.fetch(`https://web.test/api/requests/${request.id}`, {
         method: "DELETE",
-        headers: deleteHeaders,
+        headers: { ...deleteHeaders, origin: "https://web.test" },
       })
     ).status,
     200,
@@ -100,7 +134,7 @@ test("Worker service bindings: capture → D1 → frontend → deletion", async 
   // Existing proxy maps oRPC NOT_FOUND to 500; retain that behavior.
   assert.equal(
     (
-      await kit.fetch(`https://kit.test/api/requests/${request.id}`, {
+      await web.fetch(`https://web.test/api/requests/${request.id}`, {
         method: "DELETE",
         headers: deleteHeaders,
       })
@@ -134,7 +168,7 @@ test("Worker service bindings: capture → D1 → frontend → deletion", async 
     }),
     { code: "PAYLOAD_TOO_LARGE" },
   );
-  const deleted = await kit.fetch("https://kit.test/api/requests", {
+  const deleted = await web.fetch("https://web.test/api/requests", {
     method: "DELETE",
     headers: deleteHeaders,
   });
@@ -156,18 +190,18 @@ test("Worker missing bindings and backend failures are explicit", async (t) => {
         { ...common, name: "missing-dump", scriptPath: ".cloudflare/dump/worker.js" },
         {
           ...common,
-          name: "broken-kit",
-          scriptPath: ".cloudflare/kit/_worker.js",
+          ...webSource,
+          name: "broken-web",
           compatibilityFlags: ["nodejs_compat"],
           serviceBindings: { API: () => new Response("Unavailable", { status: 503 }) },
-          assets: { directory: "apps/kit/.svelte-kit/cloudflare", binding: "ASSETS" },
+          assets: { directory: "apps/web/dist/cloudflare/client", binding: "ASSETS" },
         },
         {
           ...common,
-          name: "missing-kit",
-          scriptPath: ".cloudflare/kit/_worker.js",
+          ...webSource,
+          name: "missing-web",
           compatibilityFlags: ["nodejs_compat"],
-          assets: { directory: "apps/kit/.svelte-kit/cloudflare", binding: "ASSETS" },
+          assets: { directory: "apps/web/dist/cloudflare/client", binding: "ASSETS" },
         },
       ],
     }),
@@ -184,17 +218,26 @@ test("Worker missing bindings and backend failures are explicit", async (t) => {
   const response = await (await mf.getWorker("dump")).fetch("https://capture.test/");
   assert.equal(response.status, 500);
   assert.deepEqual(await response.json(), { error: "Failed to record request" });
-  const missingKit = await mf.getWorker("missing-kit");
-  const failed = await missingKit.fetch("https://kit.test/api/requests");
-  assert.equal(failed.status, 500);
-  assert.match((await failed.json()).details, /Missing Cloudflare API binding/);
-  const brokenKit = await mf.getWorker("broken-kit");
+  const missingWeb = await mf.getWorker("missing-web");
   for (const [path, method] of [
     ["/api/requests", "GET"],
     ["/api/requests", "DELETE"],
     ["/api/requests/1", "DELETE"],
   ]) {
-    const failed = await brokenKit.fetch(`https://kit.test${path}`, {
+    const failed = await missingWeb.fetch(`https://web.test${path}`, {
+      method,
+      headers: deleteHeaders,
+    });
+    assert.equal(failed.status, 500);
+    assert.match((await failed.json()).details, /Missing Cloudflare API binding/);
+  }
+  const brokenWeb = await mf.getWorker("broken-web");
+  for (const [path, method] of [
+    ["/api/requests", "GET"],
+    ["/api/requests", "DELETE"],
+    ["/api/requests/1", "DELETE"],
+  ]) {
+    const failed = await brokenWeb.fetch(`https://web.test${path}`, {
       method,
       headers: deleteHeaders,
     });

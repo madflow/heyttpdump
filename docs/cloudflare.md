@@ -3,7 +3,7 @@
 ## Architecture and safety
 
 The optional Cloudflare target consists of `heyttpdump-api`, `heyttpdump-dump`, and
-`heyttpdump-kit`. Only the latter two have public workers.dev URLs. The API disables
+`heyttpdump-web`. Only the latter two have public workers.dev URLs. The API disables
 workers.dev, previews, and routes; callers use their `API` service binding and oRPC.
 The API's `DB` binding points to a new D1 database. Existing local SQLite captures
 are neither imported nor synchronized. Node development, production supervision,
@@ -23,7 +23,7 @@ URLs, and RPC requests. Node capture remains uncapped.
 
 ## Local development (no credentials)
 
-Use the repository's pinned Node 24 and pnpm, then:
+Use the repository's pinned Node 26 and pnpm, then:
 
 ```sh
 pnpm install --frozen-lockfile
@@ -35,12 +35,12 @@ pnpm cloudflare:dev
 
 - API Worker with Wrangler source reload: `http://localhost:8787`.
 - Capture Worker with Wrangler source reload: `http://localhost:8788`.
-- SvelteKit/Vite frontend with hot module reload: `http://localhost:8789`.
+- TanStack Start React/Vite frontend with hot module reload: `http://localhost:8789`.
 - Shared oRPC package compiler in watch mode.
 
-No frontend production build or credentials are needed. The Cloudflare adapter's
-local platform proxy connects frontend oRPC calls to the API Worker via the same
-`API` binding used in production. Remote bindings are disabled in the Vite proxy.
+No frontend production build or credentials are needed. The Cloudflare Vite plugin
+connects frontend oRPC calls to the API Worker via the same `API` binding used in
+production. Remote bindings are disabled in the Vite plugin.
 Wrangler connects local service bindings automatically; allow the API to start
 before making requests. Changes to migrations still require rerunning
 `pnpm cloudflare:migrate:local` and restarting the dev stack.
@@ -71,20 +71,26 @@ Wrangler migration tracking and repeat application are also checked. Generated
 binding declarations are checked in; rerun `cloudflare:types` after changing configs.
 The type-generation script omits Wrangler's conditional import of the generated
 frontend entry point and its source hash so clean and built checkouts produce
-identical declarations and `checkJs` does not follow compiled adapter output. Wrangler state and bundle
-artifacts are ignored.
+identical `WebEnv` declarations and `checkJs` does not follow compiled output.
+Wrangler state and bundle artifacts are ignored.
 
-The default `pnpm build` still selects adapter-node and writes `apps/kit/build`.
-An explicit `DEPLOY_TARGET=cloudflare` selects adapter-cloudflare and writes
-`apps/kit/.svelte-kit/cloudflare`. Intermediate SvelteKit files are shared: do not
-run both frontend builds concurrently. Final Node and Worker outputs are separate.
+The default `pnpm build` writes `apps/web/dist/node`; its Hono production entry is
+`dist/node/main.js`. `DEPLOY_TARGET=cloudflare` writes `apps/web/dist/cloudflare`,
+with a generated deployment configuration at `dist/cloudflare/server/wrangler.json`.
+Build, dry-run, preview, and deploy scripts use that configuration rather than the
+source configuration, so compiled Worker modules and client assets stay aligned.
+Outputs are separate and neither build overwrites the other. Route generation is
+shared; avoid simultaneous builds in a single working tree.
 
-SvelteKit 3 / adapter-cloudflare 8 exposes bindings via `cloudflare:workers`, not
-`event.platform`. Vite selects a server-only Cloudflare client helper for that build;
-Node uses the runtime, private `API_URL` declared in `src/env.ts`. Neither helper nor
-backend configuration is included in browser code. Missing Worker bindings never
+The Worker helper reads bindings via `cloudflare:workers`. Vite selects this
+server-only helper for the Cloudflare target; Node reads `process.env.API_URL` at
+runtime. Neither helper nor backend configuration is included in browser code. Missing Worker bindings never
 fall back to localhost. `nodejs_compat` is enabled only for the frontend; it does not
 provide persistent SQLite. All Workers use compatibility date `2026-04-01`.
+
+The frontend Worker is now named **`heyttpdump-web`**, giving it a new workers.dev
+URL. An existing `heyttpdump-kit` Worker is not renamed or removed automatically.
+Retire it separately only with explicit authorization after switching clients.
 
 ## Provision and deploy (explicit authorization required)
 

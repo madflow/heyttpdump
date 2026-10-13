@@ -1,10 +1,10 @@
 # heyttpdump
 
-HTTP request capture and viewing tool built with Node.js, TypeScript, Hono, and Svelte.
+HTTP request capture and viewing tool built with Node.js, TypeScript, Hono, and TanStack Start React.
 
 ## Quick start
 
-Install **Node.js 26** nd **pnpm 12.11.2**:
+Install **Node.js 26** and **pnpm 12.11.2**:
 
 ```sh
 npm install --global pnpm@12.11.2
@@ -29,15 +29,15 @@ curl -X POST 'http://localhost:3000/example?hello=world' \
 | Command                                         | Purpose                                                                   |
 | ----------------------------------------------- | ------------------------------------------------------------------------- |
 | `pnpm dev`                                      | Shared package watcher and all three services; Ctrl+C stops them together |
-| `pnpm dev:api`, `pnpm dev:dump`, `pnpm dev:kit` | Individual service plus shared package watcher                            |
+| `pnpm dev:api`, `pnpm dev:dump`, `pnpm dev:web` | Individual service plus shared package watcher                            |
 | `pnpm migrate`                                  | Idempotently initialize the existing SQLite schema                        |
-| `pnpm build`                                    | Compile shared RPC/backend TypeScript and build adapter-node frontend     |
+| `pnpm build`                                    | Compile shared RPC/backend TypeScript and build the Node frontend         |
 | `pnpm start`                                    | Migrate and supervise all compiled services (build first)                 |
-| `pnpm check`                                    | TypeScript and Svelte checks, including generated route types             |
+| `pnpm check`                                    | Strict TypeScript/TSX checks, including generated route types             |
 | `pnpm lint`                                     | ESLint                                                                    |
 | `pnpm format`, `pnpm format:check`              | Prettier formatting / validation                                          |
-| `pnpm test`                                     | Production build and isolated Node test suite                             |
-| `pnpm --filter heyttpdump-kit preview`          | Preview frontend on port 3002                                             |
+| `pnpm test`                                     | Production build, React component tests, and isolated Node tests          |
+| `pnpm --filter heyttpdump-web preview`          | Preview frontend on port 3002                                             |
 
 Source `.ts` imports compile to `.js`; `@repo/orpc` resolves through workspace exports.
 Shared code is built before consumers and watched during development. Production needs
@@ -86,7 +86,7 @@ make docker-logs
 make docker-down
 ```
 
-The pinned Node 24 **Debian Trixie slim** image runs all three compiled services in
+The pinned Node 26 **Debian Trixie slim** image runs all three compiled services in
 one container. Compose maps dump/API/UI to ports **8081 / 8082 / 8083** by default
 (`HOST_DUMP_PORT`, `HOST_API_PORT`, `HOST_WEB_PORT` override these).
 `./data` is mounted at `/app/data`; the database is `/app/data/db.sqlite`.
@@ -107,7 +107,8 @@ recreation. CI also scans the image and audits dependencies before publishing/si
 
 - `apps/api`: Hono/oRPC API, injected request repository, Node SQLite adapter.
 - `apps/dump`: Hono capture service forwarding requests through oRPC.
-- `apps/kit`: SvelteKit 3, Svelte 5, Vite 8, Tailwind 4, adapter-node frontend.
+- `apps/web`: TanStack Start **1.169.1**, React, Vite 8, Tailwind 4; Node and Worker builds.
+  The frontend workspace is `heyttpdump-web`; `dev:web` replaces `dev:kit`.
 - `packages/orpc`: runtime-neutral contracts and type-safe client.
 - `tests`: reusable repository contract tests, compatibility, injection, HTTP integration,
   and process lifecycle tests using temporary databases.

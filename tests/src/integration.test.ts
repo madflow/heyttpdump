@@ -25,7 +25,7 @@ test(
       API_URL: `${apiUrl}/rpc`,
       DUMP_PORT: String(dumpPort),
     });
-    const web = start("apps/kit/build/index.js", {
+    const web = start("apps/web/dist/node/main.js", {
       API_URL: `${apiUrl}/rpc`,
       PORT: String(webPort),
       HOST: "127.0.0.1",
@@ -65,11 +65,25 @@ test(
       ).status,
       400,
     );
+    for (const path of ["/api/requests", `/api/requests/${listed[0].id}`]) {
+      for (const headers of [
+        { "content-type": "text/plain", origin: webUrl },
+        { "content-type": "application/json", origin: "https://evil.test" },
+      ]) {
+        assert.equal((await fetch(`${webUrl}${path}`, { method: "DELETE", headers })).status, 403);
+      }
+    }
     const removed = await fetch(`${webUrl}/api/requests/${listed[0].id}`, {
       method: "DELETE",
       headers: { origin: webUrl, "content-type": "application/json" },
     });
     assert.deepEqual(await removed.json(), { success: true });
+    const missing = await fetch(`${webUrl}/api/requests/${listed[0].id}`, {
+      method: "DELETE",
+      headers: { "content-type": "application/json" },
+    });
+    assert.equal(missing.status, 500);
+    assert.equal((await missing.json()).details, "Request not found");
     assert.deepEqual(
       await (
         await fetch(`${webUrl}/api/requests`, {
@@ -81,13 +95,31 @@ test(
     );
     const html = await (await fetch(webUrl)).text();
     assert.match(html, /HTTP Requests/);
-    const asset = html.match(/(?:href|src)="([^" ]+_app\/immutable\/[^" ]+)"/);
+    const asset = html.match(/(?:href|src)="([^" ]*\/assets\/[^" ]+\.js)"/);
     assert.ok(asset, "SSR HTML references a compiled asset");
     assert.equal((await fetch(new URL(asset[1], webUrl))).status, 200);
+    assert.match(html, /Loading\.\.\./);
+    for (const match of html.matchAll(/href="([^" ]*\/assets\/[^" ]+\.(?:css|svg))"/g)) {
+      assert.equal((await fetch(new URL(match[1], webUrl))).status, 200);
+    }
+    assert.equal((await fetch(`${webUrl}/robots.txt`)).status, 200);
     await stop(api.child);
     assert.equal(api.child.exitCode, 0);
     assert.equal((await fetch(`${dumpUrl}/unavailable`)).status, 500);
-    assert.equal((await fetch(`${webUrl}/api/requests`)).status, 503);
+    const unavailable = await fetch(`${webUrl}/api/requests`);
+    assert.equal(unavailable.status, 503);
+    assert.equal((await unavailable.json()).apiUrl, `${apiUrl}/rpc`);
+    for (const path of ["/api/requests", "/api/requests/1"]) {
+      assert.equal(
+        (
+          await fetch(`${webUrl}${path}`, {
+            method: "DELETE",
+            headers: { "content-type": "application/json" },
+          })
+        ).status,
+        503,
+      );
+    }
   },
 );
 

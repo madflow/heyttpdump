@@ -2,11 +2,11 @@
 
 ## Project
 
-TypeScript/Node.js 24 LTS monorepo with pnpm workspaces:
+TypeScript/Node.js 26 monorepo with pnpm workspaces:
 
 - `apps/api`: Hono/oRPC API on port 3001, Node SQLite repository.
 - `apps/dump`: Hono HTTP capture service on port 3000.
-- `apps/kit`: SvelteKit 3 / Svelte 5 frontend on port 3002.
+- `apps/web`: TanStack Start 1.169.1 / React frontend on port 3002.
 - `packages/orpc`: shared contracts and type-safe client (`@repo/orpc`).
 
 Other tools: Vite 8, Tailwind CSS 4, Valibot, TypeScript 6, ESLint, Prettier.
@@ -22,14 +22,14 @@ pnpm migrate                 # or make init (also installs)
 pnpm dev                     # or make dev
 pnpm dev:api
 pnpm dev:dump
-pnpm dev:kit
+pnpm dev:web
 pnpm build
 pnpm start                   # compiled production stack, build first
-pnpm --filter heyttpdump-kit preview
+pnpm --filter heyttpdump-web preview
 pnpm lint
 pnpm format:check
 pnpm format
-pnpm check                   # TS + svelte-check
+pnpm check                   # strict TS/TSX + generated route types
 pnpm test                    # build + Node test runner
 pnpm cloudflare:test         # Node build + Worker builds/dry runs + isolated D1 tests
 pnpm cloudflare:dev          # local Workers/D1 + frontend HMR + shared watch
@@ -50,24 +50,27 @@ Tests use temporary databases and isolated ports. Docker smoke tests use disposa
 - External imports, then workspace imports, then relative imports.
 - Retain `.ts` extensions in relative TypeScript source imports; NodeNext builds rewrite to `.js`.
 - API/dump/shared production output goes in `dist/`; shared package exports target compiled output.
-- Frontend imports use `#lib/*` (with file extensions), not the removed SvelteKit `$lib` alias.
+- Frontend imports use package-defined `#lib/*` with file extensions.
 - Use `interface` for object shapes and `type` for unions; export public types.
 - Avoid `any`; use `unknown` and narrowing. Enable strict TS and `checkJs`.
 - camelCase variables/functions, PascalCase types/components, SCREAMING_SNAKE_CASE constants.
-- Utilities use kebab-case filenames; Svelte components use PascalCase.
+- Utilities use kebab-case filenames; React components use PascalCase.
 - Keep helpers small and modules focused. Prefer existing files over unnecessary new abstractions.
 
-## Svelte 5 and frontend
+## React and frontend
 
-- Use `$state`, `$derived`, `$effect`, and typed `$props`, not legacy stores.
-- Effects performing polling must clear intervals on teardown.
+- Keep TanStack Start pinned to exactly 1.169.1 and use its supported APIs.
+- Use typed React state, effects, and context; browser APIs belong in client-side effects.
+- Polling effects must cancel obsolete requests, avoid overlapping polls, and clear timers.
 - Use try/catch for async operations; log failures and preserve user-facing behavior.
-- Components live in `apps/kit/src/lib/components/`.
-- Keep browser helpers in `lib/utils.ts`, HTTP proxy helpers in `lib/api.ts`, and theme logic
-  in `lib/theme.svelte.ts`.
-- SvelteKit 3 configuration belongs in `vite.config.ts`. Use `$app/env` for browser detection.
+- Components live in `apps/web/src/lib/components/`.
+- Keep browser helpers in `lib/utils.ts`, HTTP helpers in `lib/api.ts`, and theme logic
+  in `lib/theme.tsx`.
+- Configure Start/React/Tailwind and conditional Cloudflare plugins in `vite.config.ts`.
 - Keep `API_URL` server-only and runtime-configurable; never expose it through public Vite defines.
-- Preserve existing frontend proxy endpoints. Their backend communication is through oRPC.
+- Preserve existing frontend proxy endpoints and deletion origin/JSON protection.
+  Backend communication remains through oRPC, in server-only modules.
+- Node and Cloudflare output directories under `apps/web/dist` must stay separate.
 
 ## API and database
 
@@ -107,7 +110,7 @@ Drain requests before closing the API database. `scripts/start.mjs` supervises p
 services, migrates, awaits readiness, forwards shutdown, and exits on child failure.
 Explicit frontend `PORT` takes precedence over `WEB_PORT`.
 
-Use Node 24 Debian Trixie-slim containers pinned by patch and manifest digest.
+Use Node 26 Debian Trixie-slim containers pinned by patch and manifest digest.
 Pin exact direct dependencies and pnpm; use frozen lockfiles in CI/Docker.
 Verify published versions, engine/peer compatibility, and security before upgrades.
 Keep pnpm supply-chain defaults; allow only necessary dependency build scripts.
