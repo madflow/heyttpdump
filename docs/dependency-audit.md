@@ -1,5 +1,25 @@
 # Dependency verification
 
+## Miniflare beta / Undici security fix
+
+CI's dependency audit reported eight Undici advisories (four high, four moderate)
+through Miniflare's exact `7.29.1` dependency. Miniflare is now pinned to
+`5.20261104.0-beta`, which includes patched Undici `7.30.1` and workerd
+`1.20261104.1`. Published npm metadata confirms Node `>=22.0.0` compatibility
+and no peer dependencies, compatible with Node 26.
+
+The direct dependency uses the beta; pinned Wrangler `4.149.0` and Cloudflare
+Vite plugin `1.63.1` retain their required `5.20261006.1-alpha`. Forcing the beta
+into those tools breaks the Vite build because the beta no longer exports
+`getNodeCompat`. A scoped `miniflare>undici` override selects patched `7.30.1`
+for their alpha copies too. Remove the override when those tools select a patched
+Miniflare themselves. pnpm recorded an exact-version minimum-release-age exclusion
+for the explicitly requested beta.
+
+Frozen installation and `pnpm audit --audit-level=high` pass with **no known
+vulnerabilities**. Strict peer checking and existing build approvals remain enabled;
+no advisory suppression was added.
+
 ## Oxlint / Oxfmt migration
 
 The root tooling now pins Oxlint `1.91.0` and Oxfmt `0.76.0`, verified against

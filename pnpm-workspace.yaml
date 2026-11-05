@@ -3,6 +3,8 @@ packages:
   - packages/*
 engineStrict: true
 strictPeerDependencies: true
+overrides:
+  "miniflare>undici": 7.30.1
 allowBuilds:
   esbuild: true
   workerd: true
@@ -23,6 +25,7 @@ minimumReleaseAgeExclude:
   - "@vitest/spy@5.0.4"
   - lucide-react@1.56.0
   - vitest@5.0.4
+  - miniflare@5.20261104.0-beta
 permissions:
   "@tanstack/react-start":
     skills: true
@@ -47,7 +50,7 @@ catalog:
   hono: 4.13.13
   jsdom: 30.1.2
   lucide-react: 1.56.0
-  miniflare: 5.20261006.1-alpha
+  miniflare: 5.20261104.0-beta
   oxfmt: 0.76.0
   oxlint: 1.91.0
   react: 19.3.0
