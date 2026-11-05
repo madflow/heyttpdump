@@ -1,5 +1,14 @@
 # Dependency verification
 
+## Docker installation fix
+
+Both Docker stages now install pnpm `12.16.1`, matching `package.json` instead of
+the stale `12.11.2` pin. Package-provided TanStack skills are explicitly declined
+with `permissions["@tanstack/react-start"].skills: false`; these are development
+agent content, not application dependencies. Approving them caused clean container
+installs to fail with `ERR_PNPM_NO_AGENT_SKILLS_DIR` because Docker has no agent
+skills directory. No agent directories need to be copied into the image.
+
 ## Miniflare beta / Undici security fix
 
 CI's dependency audit reported eight Undici advisories (four high, four moderate)
