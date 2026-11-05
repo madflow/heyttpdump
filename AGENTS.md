@@ -9,7 +9,7 @@ TypeScript/Node.js 26 monorepo with pnpm workspaces:
 - `apps/web`: TanStack Start 1.169.1 / React frontend on port 3002.
 - `packages/orpc`: shared contracts and type-safe client (`@repo/orpc`).
 
-Other tools: Vite 8, Tailwind CSS 4, Valibot, TypeScript 6, ESLint, Prettier.
+Other tools: Vite 8, Tailwind CSS 4, Valibot, TypeScript 6, Oxlint, Oxfmt.
 Exact versions and exceptions are recorded in `docs/dependency-audit.md`.
 Use the `engines.node` version and the `packageManager` pin in `package.json`.
 Do not include unrelated `.opencode` tooling in the application workspace.
@@ -46,7 +46,7 @@ Tests use temporary databases and isolated ports. Docker smoke tests use disposa
 
 ## Code conventions
 
-- Two-space indentation, double quotes, semicolons, trailing commas; Prettier governs formatting.
+- Two-space indentation, double quotes, semicolons, trailing commas; Oxfmt governs formatting.
 - External imports, then workspace imports, then relative imports.
 - Retain `.ts` extensions in relative TypeScript source imports; NodeNext builds rewrite to `.js`.
 - API/dump/shared production output goes in `dist/`; shared package exports target compiled output.

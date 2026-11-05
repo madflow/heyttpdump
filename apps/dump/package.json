@@ -12,8 +12,8 @@
     "start": "node dist/main.js"
   },
   "dependencies": {
-    "@hono/node-server": "2.1.4",
+    "@hono/node-server": "catalog:",
     "@repo/orpc": "workspace:*",
-    "hono": "4.13.13"
+    "hono": "catalog:"
   }
 }

@@ -34,8 +34,8 @@ curl -X POST 'http://localhost:3000/example?hello=world' \
 | `pnpm build`                                    | Compile shared RPC/backend TypeScript and build the Node frontend         |
 | `pnpm start`                                    | Migrate and supervise all compiled services (build first)                 |
 | `pnpm check`                                    | Strict TypeScript/TSX checks, including generated route types             |
-| `pnpm lint`                                     | ESLint                                                                    |
-| `pnpm format`, `pnpm format:check`              | Prettier formatting / validation                                          |
+| `pnpm lint`                                     | Oxlint                                                                    |
+| `pnpm format`, `pnpm format:check`              | Oxfmt formatting / validation                                             |
 | `pnpm test`                                     | Production build, React component tests, and isolated Node tests          |
 | `pnpm --filter heyttpdump-web preview`          | Preview frontend on port 3002                                             |
 

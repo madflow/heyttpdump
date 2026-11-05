@@ -1,0 +1,24 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "tabWidth": 2,
+  "useTabs": false,
+  "singleQuote": false,
+  "semi": true,
+  "trailingComma": "all",
+  "printWidth": 100,
+  "sortPackageJson": false,
+  "ignorePatterns": [
+    "node_modules",
+    "**/dist",
+    "**/build",
+    "**/.tanstack",
+    "**/routeTree.gen.ts",
+    "**/.vite",
+    "data",
+    ".opencode",
+    "pnpm-lock.yaml",
+    ".cloudflare",
+    "**/.wrangler",
+    "**/worker-configuration.d.ts"
+  ]
+}

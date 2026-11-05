@@ -26,8 +26,8 @@
     "check": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@orpc/client": "1.15.5",
-    "@orpc/contract": "1.15.5",
-    "valibot": "1.5.0"
+    "@orpc/client": "catalog:",
+    "@orpc/contract": "catalog:",
+    "valibot": "catalog:"
   }
 }

@@ -24,25 +24,22 @@
     "migrate": "pnpm --filter @repo/api migrate",
     "start": "node scripts/start.mjs",
     "check": "pnpm --filter @repo/orpc --filter @repo/api --filter @repo/dump build && pnpm -r check && tsc -p tests/tsconfig.json --noEmit",
-    "lint": "eslint .",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "lint": "oxlint --deny-warnings .",
+    "format": "oxfmt --write .",
+    "format:check": "oxfmt --check .",
     "test": "pnpm build && pnpm --filter heyttpdump-web test && tsc -p tests/tsconfig.json && node --test tests/dist/*.test.js tests/*.test.mjs"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "5.20261011.1",
-    "@eslint/js": "10.0.1",
-    "@orpc/client": "1.15.5",
+    "@cloudflare/workers-types": "catalog:",
+    "@orpc/client": "catalog:",
     "@repo/orpc": "workspace:*",
-    "@types/node": "24.19.2",
-    "concurrently": "10.0.6",
-    "eslint": "10.12.0",
-    "globals": "17.13.0",
-    "miniflare": "5.20261006.1-alpha",
-    "prettier": "3.9.10",
-    "tsx": "4.23.15",
-    "typescript": "6.0.3",
-    "typescript-eslint": "8.71.1",
-    "wrangler": "4.149.0"
+    "@types/node": "catalog:",
+    "concurrently": "catalog:",
+    "miniflare": "catalog:",
+    "oxfmt": "catalog:",
+    "oxlint": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "wrangler": "catalog:"
   }
 }

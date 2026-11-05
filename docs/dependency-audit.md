@@ -1,5 +1,28 @@
 # Dependency verification
 
+## Oxlint / Oxfmt migration
+
+The root tooling now pins Oxlint `1.91.0` and Oxfmt `0.76.0`, verified against
+published npm metadata. Both require Node `^20.19.0 || >=22.12.0`, compatible with
+the repository's Node 26 runtime. Their peers are optional; no extra peer packages,
+build approvals, or supply-chain policy exceptions were needed.
+
+`pnpm lint` uses Oxlint with errors for correctness rules and explicitly configured
+ESLint/TypeScript recommended equivalents, including the ban on explicit `any`.
+TypeScript files leave undefined-name checks to `pnpm check`. Syntax-level checks
+such as duplicate parameters and legacy octal literals are handled by the parser
+rather than standalone Oxlint rules. This is not a type-aware lint configuration.
+
+`pnpm format` and `pnpm format:check` use Oxfmt. The former Prettier options and
+generated-file exclusions are in `.oxfmtrc.json`; package sorting remains disabled
+to avoid unrelated changes. ESLint, typescript-eslint, globals, and Prettier and
+their old configuration files were removed. CI keeps the same script names.
+
+The migration audit reports **18 existing transitive advisories (8 high,
+10 moderate)** in Undici and Seroval, not in the new tools. These unrelated runtime
+dependency updates are outside this tooling migration. The historical clean audit
+below describes the earlier migration, not the current dependency tree.
+
 ## TanStack Start migration (2026-10-13)
 
 Frontend versions were verified against npm's published metadata, engines, and peers.
