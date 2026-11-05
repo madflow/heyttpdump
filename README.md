@@ -73,6 +73,15 @@ Run `pnpm cloudflare:dev` (or `make dev-cloudflare`) for local Workers/D1 and fr
 hot reload; the UI is at `http://localhost:8789` and capture at `http://localhost:8788`.
 Use `pnpm cloudflare:preview` for a production-like local Worker preview.
 
+To provision D1, migrate, and deploy all three Workers in one command:
+
+```sh
+CLOUDFLARE_ACCOUNT_ID=your-account-id pnpm cloudflare:deploy
+```
+
+The script asks for confirmation and offers Wrangler login if needed. For CI, supply
+`CLOUDFLARE_API_TOKEN` and add `--yes`. The public UI has no authentication.
+
 See [Cloudflare deployment](docs/cloudflare.md) for local development, provisioning,
 migrations, deployment, verification, and the unauthenticated-access warning.
 The shared async repository boundary supports both adapters; Node SQLite operations

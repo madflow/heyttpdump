@@ -94,6 +94,28 @@ Retire it separately only with explicit authorization after switching clients.
 
 ## Provision and deploy (explicit authorization required)
 
+### One-command deployment
+
+After `pnpm install --frozen-lockfile`, select your account and run:
+
+```sh
+export CLOUDFLARE_ACCOUNT_ID=your-account-id
+pnpm cloudflare:deploy
+```
+
+The script asks for confirmation, builds locally, checks D1 access (offering Wrangler
+login if needed), creates or reuses the configured database by name, saves its ID in
+`apps/api/wrangler.jsonc`, applies remote migrations, then deploys API → capture → web.
+Reruns reuse the database; a configured name/ID mismatch aborts rather than replacing it.
+Review the saved config before committing it. A failed step stops deployment; already
+applied migrations or deployed Workers are not rolled back. Rerun after fixing the error.
+
+For CI, set `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` via your secret manager,
+then run `pnpm cloudflare:deploy --yes`. This explicitly authorizes remote changes,
+including migrations. Never commit tokens. No remote commands run in checks CI.
+
+### Manual provisioning
+
 These commands affect your Cloudflare account. Run them only when authorized:
 
 ```sh
@@ -112,9 +134,9 @@ pnpm cloudflare:migrate:remote
 pnpm cloudflare:deploy
 ```
 
-Remote migrations are explicit and separate from deployment. The deploy command
-builds the frontend, then deploys API first, capture second, frontend last. No
-remote commands run in checks CI. Optional custom domains can be added to the
+The one-command deploy also applies migrations (the separate migration command is
+optional when using it). It builds first, then deploys API first, capture second,
+frontend last. Optional custom domains can be added to the
 frontend/capture configurations; do not add public API routes or reenable previews.
 
 ## Verify the deployed target

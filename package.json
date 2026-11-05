@@ -2,9 +2,9 @@
   "name": "heyttpdump",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@12.11.2",
+  "packageManager": "pnpm@12.16.1",
   "engines": {
-    "node": "26.11.1"
+    "node": "26"
   },
   "scripts": {
     "dev": "pnpm --filter @repo/orpc build && concurrently --kill-others -n shared,api,dump,web \"pnpm --filter @repo/orpc dev\" \"pnpm --filter @repo/api dev\" \"pnpm --filter @repo/dump dev\" \"pnpm --filter heyttpdump-web dev\"",
@@ -19,7 +19,7 @@
     "cloudflare:preview": "pnpm cloudflare:migrate:local && pnpm cloudflare:build && concurrently --kill-others -n api,dump,web \"wrangler dev -c apps/api/wrangler.jsonc --port 8787 --inspector-port 9230 --persist-to .cloudflare/state\" \"wrangler dev -c apps/dump/wrangler.jsonc --port 8788 --inspector-port 9231 --persist-to .cloudflare/state\" \"wrangler dev -c apps/web/dist/cloudflare/server/wrangler.json --port 8789 --inspector-port 9232 --persist-to .cloudflare/state\"",
     "cloudflare:migrate:local": "wrangler d1 migrations apply DB -c apps/api/wrangler.jsonc --local --persist-to .cloudflare/state",
     "cloudflare:migrate:remote": "wrangler d1 migrations apply DB -c apps/api/wrangler.jsonc --remote",
-    "cloudflare:deploy": "pnpm cloudflare:build && wrangler deploy -c apps/api/wrangler.jsonc && wrangler deploy -c apps/dump/wrangler.jsonc && wrangler deploy -c apps/web/dist/cloudflare/server/wrangler.json",
+    "cloudflare:deploy": "node scripts/cloudflare-deploy.mjs",
     "cloudflare:test": "pnpm build && tsc -p tests/tsconfig.json && pnpm cloudflare:dry-run && node --test tests/cloudflare/*.test.mjs",
     "migrate": "pnpm --filter @repo/api migrate",
     "start": "node scripts/start.mjs",
@@ -27,7 +27,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "pnpm build && pnpm --filter heyttpdump-web test && tsc -p tests/tsconfig.json && node --test tests/dist/*.test.js"
+    "test": "pnpm build && pnpm --filter heyttpdump-web test && tsc -p tests/tsconfig.json && node --test tests/dist/*.test.js tests/*.test.mjs"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "5.20261011.1",

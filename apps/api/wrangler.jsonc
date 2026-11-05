@@ -10,7 +10,7 @@
     {
       "binding": "DB",
       "database_name": "heyttpdump",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "4bea9445-5f16-4cd6-8aa0-5c0b70116bfe",
       "migrations_dir": "migrations",
     },
   ],
